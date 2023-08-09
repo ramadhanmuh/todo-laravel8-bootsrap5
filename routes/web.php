@@ -20,6 +20,9 @@ Route::get('/', function () {
 
 Route::prefix('register')->group(function () {
     Route::get('/', [RegisterController::class, 'show'])->name('register.show');
-    Route::post('/', [RegisterController::class, 'save'])->name('register.save');
+    Route::post('/', [RegisterController::class, 'save'])->name('register.save')
+                                                            ->middleware(['throttle:5,5']);
 });
+
+Route::get('users/verification');
 

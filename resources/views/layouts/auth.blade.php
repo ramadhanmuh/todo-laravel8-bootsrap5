@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="@yield('description')">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ url('/') }}">
     <x-favicon/>
     <link rel="stylesheet" href="{{ url('libraries/bootstrap-5.3.0-dist/css/bootstrap.min.css') }}">
     <title>{{ $application->name }} - @yield('title')</title>
@@ -19,7 +20,7 @@
         </div>
     </div>
     <div class="row min-vh-100 m-0 bg-white justify-content-center">
-        <div class="col-auto pt-3">
+        <div class="col-auto py-3">
             <img src="{{ url('assets/images/logo.png') }}" alt="logo" height="100">
         </div>
         <div class="col-12">

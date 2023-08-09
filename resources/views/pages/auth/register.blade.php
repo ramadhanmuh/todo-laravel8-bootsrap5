@@ -12,6 +12,7 @@
             </ul>
         </div>
         <form class="row" method="POST" action="{{ route('register.save') }}" id="registerForm">
+            <input type="hidden" name="id">
             <div class="col-12 mb-3">
                 <label for="name" class="form-label">
                     Nama

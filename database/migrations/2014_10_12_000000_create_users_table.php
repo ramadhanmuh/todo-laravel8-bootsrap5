@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->enum('role', ['Owner', 'Administrator', 'User']);
             $table->rememberToken();
             $table->unsignedBigInteger('created_at');
-            $table->unsignedBigInteger('updated_at');
+            $table->unsignedBigInteger('updated_at')->nullable();
         });
     }
 

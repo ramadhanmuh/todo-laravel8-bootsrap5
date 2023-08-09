@@ -24,6 +24,9 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
+            'id' => [
+                'required', 'uuid', 'unique:users,id'
+            ],
             'name' => [
                 'required', 'string', 'max:255'
             ],
