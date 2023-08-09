@@ -5,10 +5,13 @@
 @section('description', 'Halaman untuk mendaftar akun aplikasi ToDo.')
 
 @section('content')
-    <div class="col-11 col-md-9 col-lg-7 col-xl-6 shadow border p-3">
+    <div class="col-11 col-md-9 col-lg-7 col-xl-6 shadow border p-3 bg-white">
         <h1 class="text-center mb-3">Pendaftaran</h1>
-        <form class="row" method="POST" action="{{ route('register.save') }}">
-            @csrf
+        <div class="alert alert-danger d-none" id="validationErrorMessageColumn">
+            <ul class="m-0" id="validationErrorMessageList">
+            </ul>
+        </div>
+        <form class="row" method="POST" action="{{ route('register.save') }}" id="registerForm">
             <div class="col-12 mb-3">
                 <label for="name" class="form-label">
                     Nama
@@ -43,7 +46,7 @@
             <div class="col-12">
                 <div class="row justify-content-between align-items-center">
                     <div class="col-auto">
-                        <button class="btn btn-primary" type="submit">
+                        <button class="btn btn-primary" type="submit" disabled id="submitButton">
                             Daftar
                         </button>
                     </div>
@@ -57,3 +60,7 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+    <script defer src="{{ url('assets/js/register.js') }}"></script>
+@endpush
