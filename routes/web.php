@@ -22,8 +22,8 @@ Route::get('/', [HomeController::class, 'index'])
 
 Route::prefix('login')->group(function () {
     Route::get('/', [LoginController::class, 'show'])->name('login.show');
-    Route::post('/', [LoginController::class, 'save'])->name('login.authenticate')
-                                                            ->middleware(['throttle:5,5']);
+    Route::post('/', [LoginController::class, 'authenticate'])->name('login.authenticate')
+                                                                ->middleware(['throttle:100,5']);
 });
 
 Route::prefix('register')->group(function () {

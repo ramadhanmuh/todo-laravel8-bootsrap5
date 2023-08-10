@@ -13,7 +13,6 @@
         </div>
         <div class="d-none alert alert-success" id="successAlertForm"></div>
         <form class="row" method="POST" action="{{ route('login.authenticate') }}" id="loginForm">
-            <input type="hidden" name="id">
             <div class="col-12 mb-3">
                 <label for="identity" class="form-label">
                     Username / Email
@@ -58,5 +57,5 @@
 @endsection
 
 @push('scripts')
-    <script defer src="{{ url('assets/js/register.js') }}"></script>
+    <script defer src="{{ url('assets/js/login.js') }}"></script>
 @endpush

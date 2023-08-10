@@ -1,14 +1,4 @@
-function setID() {
-    $('input[name="id"]').val('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, 
-            v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    }));
-}
-
 setTimeout(function() {
-    setID();
-
     $('#submitButton').removeAttr('disabled');
 }, 100);
 
@@ -23,15 +13,13 @@ $('#loginForm').submit(function (event) {
 
     var data = {
         id: $('input[name="id"]').val(),
-        name: $('input[name="name"]').val(),
-        username: $('input[name="username"]').val(),
-        email: $('input[name="email"]').val(),
+        identity: $('input[name="identity"]').val(),
         password: $('input[name="password"]').val(),
-        password_confirmation: $('input[name="password_confirmation"]').val(),
+        remember_me: $('input[name="remember_me"]').is(':checked') ? $('input[name="remember_me"]').val() : ''
     };
 
     $.ajax({
-        url: $('meta[name="base-url"]').attr('content') + '/register',
+        url: $('meta[name="base-url"]').attr('content') + '/login',
         type: 'POST',
         data: JSON.stringify(data),
         contentType: 'application/json',
@@ -39,19 +27,16 @@ $('#loginForm').submit(function (event) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function (data, textStatus, jqXHR) {
-            $('#successAlertForm').html('Berhasil melakukan pendaftaran. Silahkan periksa email kamu untuk mengaktifkan akun.');
+            document.cookie = "user=John Doe";
+            $('#successAlertForm').html('Berhasil melakukan login. Silahkan tunggu beberapa saat lagi.');
             $('#successAlertForm').removeClass('d-none');
             
             $('#loader').addClass('d-none');
 
-            setID();
-
             // Kosongkan formulir
-            $('input[name="name"]').val('');
-            $('input[name="username"]').val('');
-            $('input[name="email"]').val('');
             $('input[name="password"]').val('');
-            $('input[name="password_confirmation"]').val('');
+            $('input[name="identity"]').val('');
+            $('input[name="remember_me"]').prop('checked', false);
 
             setTimeout(function () {
                 var validationErrorMessageColumn = document.getElementById('successAlertForm');
@@ -61,8 +46,11 @@ $('#loginForm').submit(function (event) {
                     scrollTop: topPos
                 });
             }, 200);
+
+            console.log(jqXHR);
+            console.log(jqXHR.getResponseHeader('Set-Cookie'));
         },
-        error: function (jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR) {
             // Validation error
             if (jqXHR.status === 422) {
                 var errorHTML = '';
@@ -80,7 +68,7 @@ $('#loginForm').submit(function (event) {
             }
 
             if (jqXHR.status !== 422 && jqXHR.status !== 429) {
-                $('#validationErrorMessageList').html('<li>Gagal melakukan pendaftaran.</li>');
+                $('#validationErrorMessageList').html('<li>Gagal melakukan login.</li>');
             }
 
             $('#validationErrorMessageColumn').removeClass('d-none');
