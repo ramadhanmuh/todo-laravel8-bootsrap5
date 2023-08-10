@@ -11,6 +11,7 @@
             <ul class="m-0" id="validationErrorMessageList">
             </ul>
         </div>
+        <div class="d-none alert alert-success" id="successAlertForm"></div>
         <form class="row" method="POST" action="{{ route('register.save') }}" id="registerForm">
             <input type="hidden" name="id">
             <div class="col-12 mb-3">
@@ -52,7 +53,7 @@
                         </button>
                     </div>
                     <div class="col-auto">
-                        <a href="{{ url('/') }}" class="text-decoration-none">
+                        <a href="{{ url('/') }}" class="text-decoration-none" id="toLoginPageButton">
                             Halaman Masuk
                         </a>
                     </div>

@@ -1,13 +1,21 @@
-$('input[name="id"]').val('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, 
-        v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-}));
+function setID() {
+    $('input[name="id"]').val('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0, 
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    }));
+}
 
-$('#submitButton').removeAttr('disabled');
+setTimeout(function() {
+    setID();
+
+    $('#submitButton').removeAttr('disabled');
+}, 100);
 
 $('#registerForm').submit(function (event) {
     event.preventDefault();
+
+    $('#validationErrorMessageList').html('');
 
     $('#validationErrorMessageColumn').addClass('d-none');
 
@@ -31,8 +39,28 @@ $('#registerForm').submit(function (event) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function (data, textStatus, jqXHR) {
-            console.log(data);
+            $('#successAlertForm').html('Berhasil melakukan pendaftaran. Silahkan periksa email kamu untuk mengaktifkan akun.');
+            $('#successAlertForm').removeClass('d-none');
+            
             $('#loader').addClass('d-none');
+
+            setID();
+
+            // Kosongkan formulir
+            $('input[name="name"]').val('');
+            $('input[name="username"]').val('');
+            $('input[name="email"]').val('');
+            $('input[name="password"]').val('');
+            $('input[name="password_confirmation"]').val('');
+
+            setTimeout(function () {
+                var validationErrorMessageColumn = document.getElementById('successAlertForm');
+                var topPos = validationErrorMessageColumn.offsetTop - 50;
+    
+                $('html').animate({
+                    scrollTop: topPos
+                });
+            }, 200);
         },
         error: function (jqXHR, textStatus, errorThrown) {
             // Validation error
@@ -44,18 +72,29 @@ $('#registerForm').submit(function (event) {
                 }
 
                 $('#validationErrorMessageList').html(errorHTML);
+            }
 
-                $('#validationErrorMessageColumn').removeClass('d-none');
+            // Too Many Request
+            if (jqXHR.status === 429) {
+                $('#validationErrorMessageList').html('<li>Terlalu banyak melakukan permintaan. Silahkan tunggu beberapa saat lagi.</li>');
+            }
 
+            if (jqXHR.status !== 422 && jqXHR.status !== 429) {
+                $('#validationErrorMessageList').html('<li>Gagal melakukan pendaftaran.</li>');
+            }
+
+            $('#validationErrorMessageColumn').removeClass('d-none');
+
+            $('#loader').addClass('d-none');
+
+            setTimeout(function () {
                 var validationErrorMessageColumn = document.getElementById('validationErrorMessageColumn');
-                var topPos = validationErrorMessageColumn.offsetTop;
-
+                var topPos = validationErrorMessageColumn.offsetTop - 50;
+    
                 $('html').animate({
                     scrollTop: topPos
                 });
-            }
-
-            $('#loader').addClass('d-none');
+            }, 200);
         }
     });
 });

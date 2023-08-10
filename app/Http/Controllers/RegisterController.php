@@ -30,7 +30,8 @@ class RegisterController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'created_at' => $time
+            'created_at' => $time,
+            'role' => 'User'
         ];
 
         $insertUser = DB::table('users')->insert($input);

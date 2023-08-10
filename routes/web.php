@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\VerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,5 +25,6 @@ Route::prefix('register')->group(function () {
                                                             ->middleware(['throttle:5,5']);
 });
 
-Route::get('users/verification');
+Route::get('users/{id}/verification/{token}', [VerificationController::class, 'verify'])
+        ->name('verification');
 
