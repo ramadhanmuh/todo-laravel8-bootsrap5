@@ -16,6 +16,8 @@ class ApplicationSeeder extends Seeder
     {
         DB::table('applications')->insert([
             'name' => 'ToDo',
+            'tagline' => 'Tempat Menulis Kegiatan',
+            'description' => 'Sebuah aplikasi pencatat kegiatan bagi semua orang.',
             'copyright' => 'Copyright 2023',
             'created_at' => time()
         ]);

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +17,13 @@ use App\Http\Controllers\VerificationController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [HomeController::class, 'index'])
+        ->name('home');
+
+Route::prefix('login')->group(function () {
+    Route::get('/', [LoginController::class, 'show'])->name('login.show');
+    Route::post('/', [LoginController::class, 'save'])->name('login.authenticate')
+                                                            ->middleware(['throttle:5,5']);
 });
 
 Route::prefix('register')->group(function () {

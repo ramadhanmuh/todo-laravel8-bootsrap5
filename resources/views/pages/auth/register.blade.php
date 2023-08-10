@@ -2,7 +2,7 @@
 
 @section('title', 'Pendaftaran')
 
-@section('description', 'Halaman untuk mendaftar akun aplikasi ToDo.')
+@section('description', 'Halaman untuk mendaftar akun aplikasi' . $application->name . '.')
 
 @section('content')
     <div class="col-11 col-md-9 col-lg-7 col-xl-6 shadow border p-3 bg-white">
@@ -18,32 +18,32 @@
                 <label for="name" class="form-label">
                     Nama
                 </label>
-                <input type="text" class="form-control" name="name" maxlength="255" value="{{ old('name') }}" required>
+                <input type="text" class="form-control" id="name" name="name" maxlength="255" value="{{ old('name') }}" required>
             </div>
             <div class="col-12 col-md-6 mb-3">
                 <label for="username" class="form-label">
                     Username
                 </label>
-                <input type="text" class="form-control" name="username" maxlength="191" value="{{ old('username') }}" required>
+                <input type="text" class="form-control" id="username" name="username" maxlength="191" value="{{ old('username') }}" required>
             </div>
     
             <div class="col-12 col-md-6 mb-3">
                 <label for="email" class="form-label">
                     Email
                 </label>
-                <input type="email" class="form-control" name="email" maxlength="191" value="{{ old('email') }}" required>
+                <input type="email" class="form-control" id="email" name="email" maxlength="191" value="{{ old('email') }}" required>
             </div>
             <div class="col-12 col-md-6 mb-3">
                 <label for="password" class="form-label">
                     Kata Sandi
                 </label>
-                <input type="password" class="form-control" name="password" maxlength="255" required>
+                <input type="password" class="form-control" id="password" name="password" maxlength="255" required>
             </div>
             <div class="col-12 col-md-6 mb-3">
                 <label for="password" class="form-label">
                     Konfirmasi Kata Sandi
                 </label>
-                <input type="password" class="form-control" name="password_confirmation" maxlength="255" required>
+                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" maxlength="255" required>
             </div>
             <div class="col-12">
                 <div class="row justify-content-between align-items-center">
@@ -53,7 +53,7 @@
                         </button>
                     </div>
                     <div class="col-auto">
-                        <a href="{{ url('/') }}" class="text-decoration-none" id="toLoginPageButton">
+                        <a href="{{ route('login.show') }}" class="text-decoration-none" id="toLoginPageButton">
                             Halaman Masuk
                         </a>
                     </div>
@@ -64,5 +64,5 @@
 @endsection
 
 @push('scripts')
-    <script defer src="{{ url('assets/js/register.js') }}"></script>
+    <script defer src="{{ url('assets/js/login.js') }}"></script>
 @endpush

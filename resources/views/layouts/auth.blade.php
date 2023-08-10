@@ -25,7 +25,7 @@
         </div>
         <div class="col-12">
             <div class="row justify-content-center">
-                <div class="col-auto">
+                <div class="col">
                     <div class="row justify-content-center">
                         @yield('content')
                     </div>

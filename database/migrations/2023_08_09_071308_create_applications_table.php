@@ -16,6 +16,8 @@ class CreateApplicationsTable extends Migration
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
+            $table->string('tagline', 255);
+            $table->string('description', 255);
             $table->string('copyright', 255);
             $table->uuid('user_id')->nullable();
             $table->unsignedBigInteger('created_at');
