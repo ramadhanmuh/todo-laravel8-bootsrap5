@@ -27,7 +27,6 @@ $('#loginForm').submit(function (event) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function (data, textStatus, jqXHR) {
-            document.cookie = "user=John Doe";
             $('#successAlertForm').html('Berhasil melakukan login. Silahkan tunggu beberapa saat lagi.');
             $('#successAlertForm').removeClass('d-none');
             
@@ -47,8 +46,9 @@ $('#loginForm').submit(function (event) {
                 });
             }, 200);
 
-            console.log(jqXHR);
-            console.log(jqXHR.getResponseHeader('Set-Cookie'));
+            setTimeout(function () {
+                
+            }, 1200)
         },
         error: function (jqXHR) {
             // Validation error

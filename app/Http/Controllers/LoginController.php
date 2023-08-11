@@ -7,13 +7,10 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
 
 class LoginController extends Controller
 {
-    public function show(Request $request) {
-        dd($request->cookie('user'));
+    public function show() {
 
         $data['application'] = Cache::rememberForever('application', function () {
             return DB::table('applications')->first();
@@ -47,7 +44,7 @@ class LoginController extends Controller
 
         unset($user->password);
 
-        session(['user' => $user]);
+        session(['userAuth' => $user]);
 
         if ($request->remember_me === 'Yes') {
             $remember_token = Str::random(100);
@@ -55,21 +52,9 @@ class LoginController extends Controller
             DB::table('users')->where('id', '=', $user->id)
                                 ->update(['remember_token' => $remember_token]);
 
-            // dd(Cookie::make('user', $remember_token, 30));
-            Cookie::queue('user', $remember_token, 43800);
-
-            // return response()->json([
-            //     'success' => true
-            // ])->cookie(cookie('user', $remember_token, 43800));
             return response()->json([
                 'success' => true
-            ]);
-            // $test = Cookie::make('user', $remember_token, 30);
-            // dd($test);
-
-            // return response()->json([
-            //     'success' => true
-            // ]);
+            ])->cookie('userAuth', $remember_token, 43800);
         }
 
         return response()->json([

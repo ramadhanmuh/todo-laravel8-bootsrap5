@@ -17,19 +17,31 @@ class UserIsLoggedIn
      */
     public function handle(Request $request, Closure $next)
     {
-        $session = session('user', null);
+        $session = session('userAuth', null);
 
         if (empty($session)) {
-            $cookie = $request->cookie('user');
+            $remember_token = $request->cookie('userAuth');
 
             $user = DB::table('users')->select('id', 'name', 'username')
-                                        ->where('remember_token', '=', 'token')
+                                        ->where('remember_token', '=', $remember_token)
+                                        ->first();
+
+            if (empty($user)) {
+                return redirect()->route('login.show');
+            }
+
+            session(['userAuth' => $user]);
+        } else {
+            $user = DB::table('users')->select('id', 'name', 'username')
+                                        ->where('id', '=', $session->id)
                                         ->first();
 
             if (empty($user)) {
                 return redirect()->route('login.show');
             }
         }
+
+        $request->attributes->add(['userAuth' => $user]);
 
         return $next($request);
     }
