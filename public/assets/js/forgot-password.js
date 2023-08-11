@@ -2,7 +2,7 @@ setTimeout(function() {
     $('#submitButton').removeAttr('disabled');
 }, 100);
 
-$('#loginForm').submit(function (event) {
+$('#forgotPasswordForm').submit(function (event) {
     event.preventDefault();
 
     $('#validationErrorMessageList').html('');

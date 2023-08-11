@@ -23,9 +23,9 @@
                     <li><a class="dropdown-item" href="#">Profil</a></li>
                     <li><a class="dropdown-item" href="#">Ubah Kata Sandi</a></li>
                     <li>
-                        <form class="dropdown-item" action="" method="POST">
+                        <form class="dropdown-item" action="{{ route('user.logout') }}" method="POST">
                             @csrf
-                            <button class="btn p-0" type="submit">
+                            <button class="btn p-0 w-100 text-start" type="submit">
                                 Logout
                             </button>
                         </form>

@@ -6,6 +6,9 @@ use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\User\HomeController as UserHomeController;
+use App\Http\Controllers\User\LogoutController as UserLogoutController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,23 +22,58 @@ use App\Http\Controllers\User\HomeController as UserHomeController;
 */
 
 Route::get('/', [HomeController::class, 'index'])
+        ->middleware('loggedoutuser')
         ->name('home');
 
 Route::prefix('login')->group(function () {
-        Route::get('/', [LoginController::class, 'show'])->name('login.show');
-        Route::post('/', [LoginController::class, 'authenticate'])->name('login.authenticate')
-                                                                ->middleware(['throttle:100,5']);
+        Route::middleware('loggedoutuser')->group(function () {
+                Route::get('/', [LoginController::class, 'show'])
+                        ->name('login.show');
+                Route::post('/', [LoginController::class, 'authenticate'])
+                        ->name('login.authenticate')
+                        ->middleware(['throttle:5,5']);
+        });
+});
+
+Route::prefix('forgot-password')->group(function () {
+        Route::middleware('loggedoutuser')->group(function () {
+                Route::get('/', [ForgotPasswordController::class, 'show'])
+                        ->name('forgot-password.show');
+                Route::post('/', [ForgotPasswordController::class, 'send'])
+                        ->name('forgot-password.send')
+                        ->middleware(['throttle:3,5']);
+        });
 });
 
 Route::prefix('register')->group(function () {
-        Route::get('/', [RegisterController::class, 'show'])->name('register.show');
-        Route::post('/', [RegisterController::class, 'save'])->name('register.save')
-                                                                ->middleware(['throttle:5,5']);
+        Route::middleware('loggedoutuser')->group(function () {
+                Route::get('/', [RegisterController::class, 'show'])
+                        ->name('register.show');
+                Route::post('/', [RegisterController::class, 'save'])
+                        ->name('register.save')
+                        ->middleware(['throttle:3,5']);
+        });
+});
+
+Route::prefix('reset-password')->group(function () {
+        Route::middleware('loggedoutuser')->group(function () {
+                Route::get('/', [ResetPasswordController::class, 'show'])
+                        ->name('reset-password.show');
+
+                Route::post('/', [ResetPasswordController::class, 'save'])
+                        ->name('reset-password.save')
+                        ->middleware(['throttle:3,5']);
+        });
 });
 
 Route::prefix('user')->group(function () {
-        Route::get('home', [UserHomeController::class, 'index'])->name('user.home')
-                                                                ->middleware(['userisloggedin']);
+        Route::middleware('userisloggedin')->group(function () {
+                Route::get('home', [UserHomeController::class, 'index'])
+                        ->name('user.home');
+
+                Route::post('logout', UserLogoutController::class)
+                        ->name('user.logout');
+        });
 });
 
 Route::get('users/{id}/verification/{token}', [VerificationController::class, 'verify'])

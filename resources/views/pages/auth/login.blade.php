@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="col-12">
-                <a href="{{ url('forgot-password') }}" class="text-decoration-none">
+                <a href="{{ route('forgot-password.show') }}" class="text-decoration-none">
                     Lupa Kata Sandi ?
                 </a>
             </div>
