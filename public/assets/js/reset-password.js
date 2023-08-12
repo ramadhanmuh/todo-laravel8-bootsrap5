@@ -2,7 +2,7 @@ setTimeout(function() {
     $('#submitButton').removeAttr('disabled');
 }, 100);
 
-$('#forgotPasswordForm').submit(function (event) {
+$('#resetPasswordForm').submit(function (event) {
     event.preventDefault();
 
     $('#validationErrorMessageList').html('');
@@ -14,11 +14,12 @@ $('#forgotPasswordForm').submit(function (event) {
     $('#loader').removeClass('d-none');
 
     var data = {
-        email: $('input[name="email"]').val()
+        password: $('input[name="password"]').val(),
+        password_confirmation: $('input[name="password_confirmation"]').val()
     };
 
     $.ajax({
-        url: $('meta[name="base-url"]').attr('content') + '/forgot-password',
+        url: window.location.href + window.location.search,
         type: 'POST',
         data: JSON.stringify(data),
         contentType: 'application/json',
@@ -26,13 +27,14 @@ $('#forgotPasswordForm').submit(function (event) {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         success: function () {
-            $('#successAlertForm').html('Berhasil mengirim tautan untuk atur ulang kata sandi. Silahkan periksa email kamu.');
+            $('#successAlertForm').html('Berhasil mengubah kata sandi. Kamu akan dialihkan ke halaman Login.');
             $('#successAlertForm').removeClass('d-none');
             
             $('#loader').addClass('d-none');
 
             // Kosongkan formulir
-            $('input[name="email"]').val('');
+            $('input[name="password"]').val('');
+            $('input[name="password_confirmation"]').val('');
 
             setTimeout(function () {
                 var validationErrorMessageColumn = document.getElementById('successAlertForm');
@@ -41,6 +43,10 @@ $('#forgotPasswordForm').submit(function (event) {
                 $('html').animate({
                     scrollTop: topPos
                 });
+
+                setTimeout(function () {
+                    window.location.href = $('meta[name="base-url"]').attr('content') + '/login';    
+                }, 2000);
             }, 200);
         },
         error: function (jqXHR) {
@@ -61,7 +67,7 @@ $('#forgotPasswordForm').submit(function (event) {
             }
 
             if (jqXHR.status !== 422 && jqXHR.status !== 429) {
-                $('#validationErrorMessageList').html('<li>Gagal melakukan pengiriman tautan.</li>');
+                $('#validationErrorMessageList').html('<li>Gagal melakukan perubahan kata sandi.</li>');
             }
 
             $('#validationErrorMessageColumn').removeClass('d-none');

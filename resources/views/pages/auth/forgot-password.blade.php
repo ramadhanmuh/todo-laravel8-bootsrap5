@@ -24,7 +24,7 @@
                 <div class="row justify-content-between align-items-center">
                     <div class="col-auto">
                         <button class="btn btn-primary" type="submit" disabled id="submitButton">
-                            Ubah Kata Sandi
+                            Kirim Tautan
                         </button>
                     </div>
                     <div class="col-auto">
@@ -39,5 +39,5 @@
 @endsection
 
 @push('scripts')
-    <script defer src="{{ url('assets/js/login.js') }}"></script>
+    <script defer src="{{ url('assets/js/forgot-password.js') }}"></script>
 @endpush

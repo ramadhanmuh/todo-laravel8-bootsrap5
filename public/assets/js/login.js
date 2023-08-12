@@ -9,10 +9,11 @@ $('#loginForm').submit(function (event) {
 
     $('#validationErrorMessageColumn').addClass('d-none');
 
+    $('#successAlertForm').addClass('d-none');
+
     $('#loader').removeClass('d-none');
 
     var data = {
-        id: $('input[name="id"]').val(),
         identity: $('input[name="identity"]').val(),
         password: $('input[name="password"]').val(),
         remember_me: $('input[name="remember_me"]').is(':checked') ? $('input[name="remember_me"]').val() : ''

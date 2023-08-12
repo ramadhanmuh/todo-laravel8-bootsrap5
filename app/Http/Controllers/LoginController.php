@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 class LoginController extends Controller
 {
     public function show() {
-
         $data['application'] = Cache::rememberForever('application', function () {
             return DB::table('applications')->first();
         });

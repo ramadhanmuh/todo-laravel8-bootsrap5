@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LoggedOutUser
 {
@@ -16,12 +17,19 @@ class LoggedOutUser
      */
     public function handle(Request $request, Closure $next)
     {
-        $session = session('userAuth', null);
+        if (empty(session('userAuth', null))) {
+            $remember_token = $request->cookie('userAuth');
 
-        if (!empty($session)) {
-            return redirect()->route('user.home');
+            $user = DB::table('users')->select('id', 'name', 'username')
+                                        ->where('remember_token', '=', $remember_token)
+                                        ->first();
+
+            if (!empty($user)) {
+                session(['userAuth' => $user]);
+    
+                return redirect()->route('user.home');
+            }
         }
-
         return $next($request);
     }
 }

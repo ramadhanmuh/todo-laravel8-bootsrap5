@@ -19,6 +19,8 @@ $('#registerForm').submit(function (event) {
 
     $('#validationErrorMessageColumn').addClass('d-none');
 
+    $('#successAlertForm').addClass('d-none');
+
     $('#loader').removeClass('d-none');
 
     var data = {
