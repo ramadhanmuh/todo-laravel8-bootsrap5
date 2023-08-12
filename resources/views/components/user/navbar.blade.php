@@ -9,7 +9,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link {{ $navbarActive === 'home' ? 'active' : '' }}" href="#">Beranda</a>
+                    <a class="nav-link {{ $navbarActive === 'home' ? 'active' : '' }}" href="{{ route('user.home') }}">Beranda</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Tugas</a>
@@ -20,8 +20,8 @@
                     {{ request()->get('userAuth')->username }}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end">
-                    <li><a class="dropdown-item" href="#">Profil</a></li>
-                    <li><a class="dropdown-item" href="#">Ubah Kata Sandi</a></li>
+                    <li><a class="dropdown-item {{ $navbarActive === 'profile' ? 'active' : '' }}" href="{{ route('user.profile.index') }}">Profil</a></li>
+                    <li><a class="dropdown-item {{ $navbarActive === 'change-password' ? 'active' : '' }}" href="#">Ubah Kata Sandi</a></li>
                     <li>
                         <form class="dropdown-item" action="{{ route('user.logout') }}" method="POST">
                             @csrf

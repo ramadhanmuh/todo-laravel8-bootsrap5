@@ -9,6 +9,7 @@ use App\Http\Controllers\User\HomeController as UserHomeController;
 use App\Http\Controllers\User\LogoutController as UserLogoutController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\User\ProfileController as UserProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,11 +69,27 @@ Route::prefix('reset-password')->group(function () {
 
 Route::prefix('user')->group(function () {
         Route::middleware('userisloggedin')->group(function () {
-                Route::get('home', [UserHomeController::class, 'index'])
-                        ->name('user.home');
+                Route::name('user.')->group(function () {
+                        Route::get('home', [UserHomeController::class, 'index'])
+                                ->name('home');
+        
+                        Route::post('logout', UserLogoutController::class)
+                                ->name('logout');
 
-                Route::post('logout', UserLogoutController::class)
-                        ->name('user.logout');
+                        Route::prefix('profile')->group(function () {
+                                Route::controller(UserProfileController::class)->group(function () {
+                                        Route::name('profile.')->group(function () {
+                                                Route::get('/', 'index')
+                                                        ->name('index');
+                                                Route::get('edit', 'edit')
+                                                        ->name('edit');
+                                                Route::put('edit', 'update')
+                                                        ->name('update');
+                                        });
+                                });
+                        });
+                });
+
         });
 });
 

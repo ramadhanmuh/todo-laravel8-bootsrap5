@@ -25,8 +25,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => time(),
                 'password' => Hash::make('owner'),
                 'role' => 'Owner',
-                'created_at' => time(),
-                'updated_at' => time()
+                'created_at' => time()
             ],
             [
                 'id' => Str::uuid(),
@@ -36,8 +35,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => time(),
                 'password' => Hash::make('admin'),
                 'role' => 'Administrator',
-                'created_at' => time(),
-                'updated_at' => time()
+                'created_at' => time()
             ],
             [
                 'id' => Str::uuid(),
@@ -47,8 +45,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => time(),
                 'password' => Hash::make('user'),
                 'role' => 'User',
-                'created_at' => time(),
-                'updated_at' => time()
+                'created_at' => time()
             ],
         ]);
     }

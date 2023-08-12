@@ -51,6 +51,7 @@ class ResetPasswordController extends Controller
         }
 
         $updateUser = DB::table('users')->where('email', '=', $params['email'])
+                                        ->where('role', '=', 'User')
                                         ->update([
                                             'password' => Hash::make($validated['password'])
                                         ]);

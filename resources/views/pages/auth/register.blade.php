@@ -64,5 +64,5 @@
 @endsection
 
 @push('scripts')
-    <script defer src="{{ url('assets/js/login.js') }}"></script>
+    <script defer src="{{ url('assets/js/register.js') }}"></script>
 @endpush

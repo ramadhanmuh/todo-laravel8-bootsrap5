@@ -81,7 +81,12 @@ $('#registerForm').submit(function (event) {
                 $('#validationErrorMessageList').html('<li>Terlalu banyak melakukan permintaan. Silahkan tunggu beberapa saat lagi.</li>');
             }
 
-            if (jqXHR.status !== 422 && jqXHR.status !== 429) {
+            if (jqXHR.status === 419) {
+                $('#validationErrorMessageList').html('<li>Halaman kadaluarsa.</li>');
+                location.reload();
+            }
+
+            if (jqXHR.status !== 422 && jqXHR.status !== 429 && jqXHR.status !== 419) {
                 $('#validationErrorMessageList').html('<li>Gagal melakukan pendaftaran.</li>');
             }
 
