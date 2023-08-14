@@ -38,7 +38,6 @@ class UpdateProfileRequest extends FormRequest
                 function ($attribute, $value, $fail) use ($user) {
                     if ($value !== $user->username) {
                         $user = DB::table('users')->select('id')
-                                                    ->where('role', '=', 'User')
                                                     ->where('username', '=', $value)
                                                     ->first();
     
@@ -53,7 +52,6 @@ class UpdateProfileRequest extends FormRequest
                 function ($attribute, $value, $fail) use ($user) {
                     if ($value !== $user->email) {
                         $user = DB::table('users')->select('id')
-                                                    ->where('role', '=', 'User')
                                                     ->where('email', '=', $value)
                                                     ->first();
     

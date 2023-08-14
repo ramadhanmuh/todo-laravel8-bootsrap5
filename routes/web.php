@@ -10,6 +10,8 @@ use App\Http\Controllers\User\LogoutController as UserLogoutController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
+use App\Http\Controllers\User\ChangePasswordController as UserChangePasswordController;
+use App\Http\Controllers\User\TaskController as UserTaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,6 +90,19 @@ Route::prefix('user')->group(function () {
                                         });
                                 });
                         });
+
+                        Route::prefix('change-password')->group(function () {
+                                Route::controller(UserChangePasswordController::class)->group(function () {
+                                        Route::name('change-password.')->group(function () {
+                                                Route::get('/', 'edit')
+                                                        ->name('edit');
+                                                Route::put('edit', 'update')
+                                                        ->name('update');
+                                        });
+                                });
+                        });
+
+                        Route::resource('tasks', UserTaskController::class);
                 });
 
         });

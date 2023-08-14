@@ -12,7 +12,7 @@
                     <a class="nav-link {{ $navbarActive === 'home' ? 'active' : '' }}" href="{{ route('user.home') }}">Beranda</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Tugas</a>
+                    <a class="nav-link {{ $navbarActive === 'tasks' ? 'active' : '' }}" href="{{ route('user.tasks.index') }}">Tugas</a>
                 </li>
             </ul>
             <div>
@@ -21,7 +21,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end">
                     <li><a class="dropdown-item {{ $navbarActive === 'profile' ? 'active' : '' }}" href="{{ route('user.profile.index') }}">Profil</a></li>
-                    <li><a class="dropdown-item {{ $navbarActive === 'change-password' ? 'active' : '' }}" href="#">Ubah Kata Sandi</a></li>
+                    <li><a class="dropdown-item {{ $navbarActive === 'change-password' ? 'active' : '' }}" href="{{ route('user.change-password.edit') }}">Ubah Kata Sandi</a></li>
                     <li>
                         <form class="dropdown-item" action="{{ route('user.logout') }}" method="POST">
                             @csrf
