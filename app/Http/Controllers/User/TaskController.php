@@ -32,7 +32,13 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+        $data['application'] = Cache::rememberForever('application', function () {
+            return DB::table('applications')->first();
+        });
+
+        $data['navbarActive'] = 'tasks';
+
+        return view('pages.user.task.create', $data);
     }
 
     /**

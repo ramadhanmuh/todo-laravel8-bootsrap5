@@ -15,7 +15,7 @@
                     <a class="nav-link {{ $navbarActive === 'tasks' ? 'active' : '' }}" href="{{ route('user.tasks.index') }}">Tugas</a>
                 </li>
             </ul>
-            <div>
+            <div class="mt-2 mt-lg-0">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     {{ request()->get('userAuth')->username }}
                 </a>
