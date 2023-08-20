@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\StoreTaskRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -47,9 +48,61 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request)
     {
-        //
+        if (empty($request->start_date)) {
+            $start_time = null;
+            $end_time = null;
+        } else {
+            $start_time = $request->start_date;
+
+            if (empty($request->start_time)) {
+                $start_time .= ' 00:00:00';
+            } else {
+                $start_time .= ' ' . $request->start_time . ':00';
+            }
+
+            $start_time = strtotime($start_time);
+
+            if (!empty($request->end_date)) {
+                $end_time = $request->end_date;
+            }
+
+            if (empty($request->end_time)) {
+                $end_time .= ' 00:00:00';
+            } else {
+                $end_time .= ' ' . $request->end_time . ':00';
+            }
+            
+            $end_time = strtotime($end_time);
+
+            if (!empty($end_time) && $start_time >= $end_time) {
+                return back()->withErrors([
+                    'end_time' => 'Waktu selesai harus lebih dari waktu mulai.',
+                ])->withInput($request->all());
+            }
+        }
+
+        $input = [
+            'id' => $request->id,
+            'user_id' => $request->get('userAuth')->id,
+            'title' => $request->title,
+            'description' => $request->description,
+            'start_time' => $start_time,
+            'end_time' => $end_time,
+            'created_at' => time(),
+            'updated_at' => null
+        ];
+
+        $process = DB::table('tasks')->insert($input);
+
+        if ($process) {
+            $request->session()->flash('taskProcessSuccessfully', 'Berhasil menambah tugas.');
+        } else {
+            $request->session()->flash('taskProcessFailed', 'Gagal menambah tugas.');
+        }
+
+        return redirect()->route('user.tasks.index');
     }
 
     /**

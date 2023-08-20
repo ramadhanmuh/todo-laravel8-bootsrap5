@@ -96,5 +96,6 @@
 @endsection
 
 @push('scripts')
-    {{-- <script defer src="{{ url('assets/js/UnixToLocal.js') }}"></script> --}}
+    {{-- <script defer src="{{ url('libraries/ckeditor5-39.0.1/build/ckeditor.js') }}"></script>
+    <script src="{{ url('assets/js/user/task/form.js') }}"></script> --}}
 @endpush

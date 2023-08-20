@@ -31,7 +31,7 @@ class RegisterRequest extends FormRequest
                 'required', 'string', 'max:255'
             ],
             'username' => [
-                'required', 'string', 'max:191', 'unique:users,username'
+                'required', 'string', 'alpha_dash', 'max:191', 'unique:users,username'
             ],
             'email' => [
                 'required', 'email', 'max:191', 'unique:users,email'
