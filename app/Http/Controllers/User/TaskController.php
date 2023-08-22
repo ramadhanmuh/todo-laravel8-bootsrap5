@@ -17,6 +17,7 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
+        // dd(date('Y-m-d H:i:s', 1692537522), strtotime('2023-08-20 13:18:42'));
         $data['application'] = Cache::rememberForever('application', function () {
             return DB::table('applications')->first();
         });
@@ -30,8 +31,12 @@ class TaskController extends Controller
             'day' => $request->day
         ];
 
-        if (!$data['input']['page']) {
+        if ($data['input']['page'] < 1) {
             $data['input']['page'] = 1;
+        }
+
+        if ($data['input']['page'] > 500) {
+            $data['input']['page'] = 500;
         }
 
         if (empty($data['input']['year']) && ($data['input']['month'] || $data['input']['day'])) {
@@ -55,19 +60,19 @@ class TaskController extends Controller
         }
 
         if ($data['input']['year'] && empty($data['input']['month']) && empty($data['input']['day'])) {
-            $startTime = intval(strtotime($data['input']['year']) . '-01-01');
-            $lastDay = date('t', strtotime($data['input']['year'] . '-12-01'));
+            $startTime = intval(strtotime($data['input']['year'] . '-01-01 00:00:00'));
+            $lastDay = date('t', strtotime($data['input']['year'] . '-12-01 23:59:59'));
             $endTime = intval(strtotime($data['input']['year'] . '-12-' . $lastDay));
         }
 
         if ($data['input']['year'] && $data['input']['month'] && empty($data['input']['day'])) {
-            $startTime = intval(strtotime($data['input']['year']) . '-' . $data['input']['month'] . '-01');
+            $startTime = intval(strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-01'));
             $lastDay = date('t', strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-01'));
             $endTime = intval(strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $lastDay));
         }
 
         if ($data['input']['year'] && $data['input']['month'] && $data['input']['day']) {
-            $startTime = intval(strtotime($data['input']['year']) . '-' . $data['input']['month'] . '-' . $data['input']['day']);
+            $startTime = intval(strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $data['input']['day']));
             $endTime = intval(strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $data['input']['day']));
         }
 
@@ -86,7 +91,7 @@ class TaskController extends Controller
             $data['totalItems'] = $data['totalItems']->count();
         }
 
-        $data['totalPages'] = ceil($data['totalItems'] / 12);
+        $data['totalPages'] = intval(ceil($data['totalItems'] / 12));
 
         $data['items'] = DB::table('tasks')
                             ->select('id', 'title', 'description')
@@ -102,6 +107,8 @@ class TaskController extends Controller
                                         ->offset($offset)
                                         ->limit(12)
                                         ->get();
+
+        // dd($startTime, $endTime);
 
         return view('pages.user.task.index', $data);
     }
