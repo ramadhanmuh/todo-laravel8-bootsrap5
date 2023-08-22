@@ -27,10 +27,9 @@
             </div>
             {{-- Filter --}}
             <form class="row" action="{{ route('user.tasks.index') }}">
-                <input type="hidden" name="page" value="{{ $input['page'] }}">
-                <div class="col-12 col-md-9 col-lg-7 col-xl-5">
+                <div class="col-12 col-md-9 col-lg-7 col-xl-6">
                     <div class="row">
-                        <div class="col col-md col-lg-4">
+                        <div class="col col-md col-lg-3">
                             <div class="row align-items-center">
                                 <div class="col-auto pe-0">
                                     <label for="year" class="col-form-label fw-bold">Tahun</label>
@@ -55,7 +54,7 @@
                                 <div class="col-auto col-md-6 pe-0">
                                     <label for="day" class="col-form-label fw-bold">Tanggal</label>
                                 </div>
-                                <div class="col-12 col-md-6">
+                                <div class="col-12 col-md-6 ">
                                     <input type="text" class="form-control form-control-sm" id="day" name="day" placeholder="**" value="{{ $input['day'] }}">
                                 </div>
                             </div>

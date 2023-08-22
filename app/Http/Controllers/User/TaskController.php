@@ -40,6 +40,32 @@ class TaskController extends Controller
             $data['input']['page'] = 500;
         }
 
+        $listChanges = Cache::get('taskListChanges' . $request->get('userAuth')->id, null);
+
+        $taskManaged = Cache::get('taskManaged' . $request->get('userAuth')->id, null);
+
+        if ((empty($listChanges) && empty($taskManaged)) || (!empty($taskManaged) && $listChanges !== $taskManaged)) {
+            if (empty($taskManaged)) {
+                Cache::forever('taskListChanges' . $request->get('userAuth')->id, 1);
+            } else {
+                Cache::forever('taskListChanges' . $request->get('userAuth')->id, $taskManaged);
+            }
+
+            $data = $this->getListFromDatabase($data, $request);
+        } else {
+            $cache = Cache::get('taskList' . $request->get('userAuth')->id . json_encode($data['input']));
+
+            if (empty($cache)) {
+                $data = $this->getListFromDatabase($data, $request);
+            } else {
+                $data = $cache;
+            }
+        }
+
+        return view('pages.user.task.index', $data);
+    }
+
+    private function getListFromDatabase($data, $request) {
         if (empty($data['input']['year']) && ($data['input']['month'] || $data['input']['day'])) {
             $lastData = DB::table('tasks')
                             ->where('user_id', '=', $request->get('userAuth')->id)
@@ -116,6 +142,10 @@ class TaskController extends Controller
 
         $data['totalPages'] = intval(ceil($data['totalItems'] / 12));
 
+        if ($data['totalPages'] > 500) {
+            $data['totalPages'] = 500;
+        }
+
         $data['items'] = DB::table('tasks')
                             ->select('id', 'title', 'description')
                             ->where('user_id', '=', $request->get('userAuth')->id);
@@ -131,7 +161,9 @@ class TaskController extends Controller
                                         ->limit(12)
                                         ->get();
 
-        return view('pages.user.task.index', $data);
+        Cache::forever('taskList' . $request->get('userAuth')->id . json_encode($data['input']), $data);
+
+        return $data;
     }
 
     /**
@@ -200,6 +232,8 @@ class TaskController extends Controller
             return back()->withInput($request->all())->withErrors($errors);
         }
 
+        $currentTime = time();
+
         $input = [
             'id' => $request->id,
             'user_id' => $request->get('userAuth')->id,
@@ -207,7 +241,7 @@ class TaskController extends Controller
             'description' => $request->description,
             'start_time' => $start_time,
             'end_time' => $end_time,
-            'created_at' => time(),
+            'created_at' => $currentTime,
             'updated_at' => null
         ];
 
@@ -215,6 +249,7 @@ class TaskController extends Controller
 
         if ($process) {
             $request->session()->flash('taskProcessSuccessfully', 'Berhasil menambah tugas.');
+            Cache::forever('taskManaged' . $request->get('userAuth')->id, $currentTime);
         } else {
             $request->session()->flash('taskProcessFailed', 'Gagal menambah tugas.');
         }
@@ -228,9 +263,26 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
-        //
+        $data['item'] = DB::table('tasks')
+                            ->select([
+                                'title', 'description', 'start_time',
+                                'end_time', 'created_at', 'updated_at'
+                            ])
+                            ->where('user_id', '=', $request->get('userAuth')->id)
+                            ->where('id', '=', $id)
+                            ->first();
+
+        if (empty($data['item'])) {
+            abort(404);
+        }
+
+        $data['application'] = Cache::rememberForever('application', function () {
+            return DB::table('applications')->first();
+        });
+
+        return 'test';
     }
 
     /**
