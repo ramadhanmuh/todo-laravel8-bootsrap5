@@ -4,9 +4,11 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreTaskRequest;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use DateTimeZone;
 
 class TaskController extends Controller
 {
@@ -17,7 +19,6 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        // dd(date('Y-m-d H:i:s', 1692537522), strtotime('2023-08-20 13:18:42'));
         $data['application'] = Cache::rememberForever('application', function () {
             return DB::table('applications')->first();
         });
@@ -49,31 +50,53 @@ class TaskController extends Controller
         }
 
         if (empty($data['input']['month']) && $data['input']['day']) {
-            if (!isset($lastData)) {
-                $lastData = DB::table('tasks')
-                                ->where('user_id', '=', $request->get('userAuth')->id)
-                                ->orderByDesc('created_at')
-                                ->first();
-            }
+            $data['input']['month'] = '1';
+        }
 
-            $data['input']['month'] = date('m', $lastData->created_at);
+        if (intval($data['input']['year']) > 9999) {
+            $data['input']['year'] = '9999';
+        }
+
+        if (intval($data['input']['month']) > 12) {
+            $data['input']['month'] = '12';
         }
 
         if ($data['input']['year'] && empty($data['input']['month']) && empty($data['input']['day'])) {
-            $startTime = intval(strtotime($data['input']['year'] . '-01-01 00:00:00'));
+            $newDateTime = new DateTime($data['input']['year'] . '-01-01 00:00:00');
+            $newDateTime->setTimezone(new DateTimeZone('UTC'));
+            $startTime = intval(strtotime($newDateTime->format('Y-m-d H:i:s')));
+
             $lastDay = date('t', strtotime($data['input']['year'] . '-12-01 23:59:59'));
-            $endTime = intval(strtotime($data['input']['year'] . '-12-' . $lastDay));
+
+            $newDateTime = new DateTime($data['input']['year'] . '-12-' . $lastDay);
+            $newDateTime->setTimezone(new DateTimeZone('UTC'));
+            $endTime = intval(strtotime($newDateTime->format('Y-m-d H:i:s')));
         }
 
         if ($data['input']['year'] && $data['input']['month'] && empty($data['input']['day'])) {
-            $startTime = intval(strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-01'));
+            $newDateTime = new DateTime($data['input']['year'] . '-' . $data['input']['month'] . '-01 00:00:00');
+            $newDateTime->setTimezone(new DateTimeZone('UTC'));
+            $startTime = intval(strtotime($newDateTime->format('Y-m-d H:i:s')));
+
             $lastDay = date('t', strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-01'));
-            $endTime = intval(strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $lastDay));
+
+            $newDateTime = new DateTime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $lastDay . ' 23:59:59');
+            $newDateTime->setTimezone(new DateTimeZone('UTC'));
+            $endTime = intval(strtotime($newDateTime->format('Y-m-d H:i:s')));
         }
 
         if ($data['input']['year'] && $data['input']['month'] && $data['input']['day']) {
-            $startTime = intval(strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $data['input']['day']));
-            $endTime = intval(strtotime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $data['input']['day']));
+            if (!checkdate(intval($data['input']['month']), intval($data['input']['day']), intval($data['input']['year']))) {
+                $data['input']['day'] = '1';
+            }
+
+            $newDateTime = new DateTime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $data['input']['day'] . ' 00:00:00');
+            $newDateTime->setTimezone(new DateTimeZone('UTC'));
+            $startTime = intval(strtotime($newDateTime->format('Y-m-d H:i:s')));
+
+            $newDateTime = new DateTime($data['input']['year'] . '-' . $data['input']['month'] . '-' . $data['input']['day'] . ' 23:59:59');
+            $newDateTime->setTimezone(new DateTimeZone('UTC'));
+            $endTime = intval(strtotime($newDateTime->format('Y-m-d H:i:s')));
         }
 
         if (isset($startTime)) {
@@ -108,8 +131,6 @@ class TaskController extends Controller
                                         ->limit(12)
                                         ->get();
 
-        // dd($startTime, $endTime);
-
         return view('pages.user.task.index', $data);
     }
 
@@ -137,37 +158,46 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        if (empty($request->start_date)) {
-            $start_time = null;
-            $end_time = null;
-        } else {
-            $start_time = $request->start_date;
+        $errors = [];
 
+        $start_time = $request->start_date;
+
+        if (!empty($start_time)) {
             if (empty($request->start_time)) {
                 $start_time .= ' 00:00:00';
             } else {
-                $start_time .= ' ' . $request->start_time . ':00';
+                $start_time .= ' ' . $request->start_time;
             }
 
             $start_time = strtotime($start_time);
+        }
 
-            if (!empty($request->end_date)) {
-                $end_time = $request->end_date;
-            }
+        if ($start_time === false) {
+            $errors['start_time'] = 'The Start Time could not be created.';
+        }
 
+        $end_time = $request->end_date;
+
+        if (!empty($end_time)) {
             if (empty($request->end_time)) {
                 $end_time .= ' 00:00:00';
             } else {
-                $end_time .= ' ' . $request->end_time . ':00';
+                $end_time .= ' ' . $request->end_time;
             }
-            
-            $end_time = strtotime($end_time);
 
-            if (!empty($end_time) && $start_time >= $end_time) {
-                return back()->withErrors([
-                    'end_time' => 'Waktu selesai harus lebih dari waktu mulai.',
-                ])->withInput($request->all());
-            }
+            $end_time = strtotime($end_time);
+        }
+
+        if ($end_time === false) {
+            $errors['end_time'] = 'The End Time could not be created.';
+        }
+
+        if ((!empty($start_time) && !empty($end_time)) && ($start_time > $end_time)) {
+            $errors['end_time'] = 'The Start Time needs to be more than equal to the End Time.';
+        }
+
+        if (count($errors) > 0) {
+            return back()->withInput($request->all())->withErrors($errors);
         }
 
         $input = [

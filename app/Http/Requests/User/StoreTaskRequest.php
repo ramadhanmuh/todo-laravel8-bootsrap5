@@ -49,7 +49,7 @@ class StoreTaskRequest extends FormRequest
             ],
             'end_time' => [
                 'nullable', 'string', 'date_format:H:i',
-                function ($attribute, $value, $fail) use ($start_date) {
+                function ($attribute, $value, $fail) use ($end_date) {
                     if (empty($end_date) && !empty($value)) {
                         $fail('The End Date is required.');
                     }

@@ -117,8 +117,14 @@
                                         {{ $item->title }}
                                     </a>
                                 </h5>
-                                <div class="col-12 position-relative overflow-hidden task-column" style="max-height: 5rem;">
-                                    <p class="card-text task-description">{{ $item->description }}</p>
+                                <div class="col-12 position-relative overflow-hidden task-column" style="min-height: 1rem; max-height: 5rem;">
+                                    <div class="card-text task-description">
+                                        @php
+                                            $description = preg_replace('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i', '', $item->description);
+                                            $description = preg_replace('/(on\w+\s*=)/i', '', $description);
+                                            echo $description;
+                                        @endphp
+                                    </div>
                                     <div class="position-absolute bottom-0 w-100 continue-block" style="background: linear-gradient(to bottom, transparent, white); height: 2em">
                                     </div>
                                 </div>
