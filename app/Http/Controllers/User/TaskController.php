@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreTaskRequest;
+use App\Http\Requests\User\UpdateTaskRequest;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -267,7 +268,7 @@ class TaskController extends Controller
     {
         $data['item'] = DB::table('tasks')
                             ->select([
-                                'title', 'description', 'start_time',
+                                'id', 'title', 'description', 'start_time',
                                 'end_time', 'created_at', 'updated_at'
                             ])
                             ->where('user_id', '=', $request->get('userAuth')->id)
@@ -278,11 +279,26 @@ class TaskController extends Controller
             abort(404);
         }
 
+        $data['item']->description = $this->preventJavascriptScript(
+            $data['item']->description
+        );
+
         $data['application'] = Cache::rememberForever('application', function () {
             return DB::table('applications')->first();
         });
 
-        return 'test';
+        $data['navbarActive'] = 'tasks';
+
+        return view('pages.user.task.detail', $data);
+    }
+
+    private function preventJavascriptScript($string) {
+        if (!empty($string)) {
+            $string = preg_replace('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i', '', $string);
+            $string = preg_replace('/(on\w+\s*=)/i', '', $string);
+        }
+
+        return $string;
     }
 
     /**
@@ -291,9 +307,43 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, Request $request)
     {
-        //
+        $data['item'] = DB::table('tasks')
+                            ->select([
+                                'id', 'title', 'description', 'start_time',
+                                'end_time', 'created_at', 'updated_at'
+                            ])
+                            ->where('user_id', '=', $request->get('userAuth')->id)
+                            ->where('id', '=', $id)
+                            ->first();
+
+        if (empty($data['item'])) {
+            abort(404);
+        }
+
+        $data['item']->description = $this->preventJavascriptScript(
+            $data['item']->description
+        );
+
+        $data['application'] = Cache::rememberForever('application', function () {
+            return DB::table('applications')->first();
+        });
+
+        $data['navbarActive'] = 'tasks';
+
+        $data['backURL'] = url()->previous();
+        $segments = explode('/', $data['backURL']);
+        $numSegments = count($segments); 
+        $currentSegment = $segments[$numSegments - 1];
+        $segment = explode('?', $currentSegment);
+        $segment = $segment[0];
+
+        if ($segment !== 'tasks') {
+            $data['backURL'] = route('user.tasks.index');
+        }
+
+        return view('pages.user.task.edit', $data);
     }
 
     /**
@@ -303,9 +353,83 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateTaskRequest $request, $id)
     {
-        //
+        $item = DB::table('tasks')
+                            ->select([
+                                'id'
+                            ])
+                            ->where('user_id', '=', $request->get('userAuth')->id)
+                            ->where('id', '=', $id)
+                            ->first();
+
+        if (empty($item)) {
+            abort(404);
+        }
+
+        $errors = [];
+
+        $start_time = $request->start_date;
+
+        if (!empty($start_time)) {
+            if (empty($request->start_time)) {
+                $start_time .= ' 00:00:00';
+            } else {
+                $start_time .= ' ' . $request->start_time;
+            }
+
+            $start_time = strtotime($start_time);
+        }
+
+        if ($start_time === false) {
+            $errors['start_time'] = 'The Start Time could not be created.';
+        }
+
+        $end_time = $request->end_date;
+
+        if (!empty($end_time)) {
+            if (empty($request->end_time)) {
+                $end_time .= ' 00:00:00';
+            } else {
+                $end_time .= ' ' . $request->end_time;
+            }
+
+            $end_time = strtotime($end_time);
+        }
+
+        if ($end_time === false) {
+            $errors['end_time'] = 'The End Time could not be created.';
+        }
+
+        if ((!empty($start_time) && !empty($end_time)) && ($start_time > $end_time)) {
+            $errors['end_time'] = 'The Start Time needs to be more than equal to the End Time.';
+        }
+
+        if (count($errors) > 0) {
+            return back()->withInput($request->all())->withErrors($errors);
+        }
+
+        $currentTime = time();
+
+        $input = [
+            'title' => $request->title,
+            'description' => $request->description,
+            'start_time' => $start_time,
+            'end_time' => $end_time,
+            'updated_at' => $currentTime
+        ];
+
+        $process = DB::table('tasks')->where('id', '=', $id)
+                                    ->update($input);
+
+        if ($process) {
+            $request->session()->flash('taskProcessSuccessfully', 'Berhasil mengubah tugas.');
+            Cache::forever('taskManaged' . $request->get('userAuth')->id, $currentTime);
+        } else {
+            $request->session()->flash('taskProcessFailed', 'Gagal mengubah tugas.');
+        }
+
+        return redirect()->route('user.tasks.index');
     }
 
     /**

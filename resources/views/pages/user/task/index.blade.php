@@ -119,9 +119,11 @@
                                 <div class="col-12 position-relative overflow-hidden task-column" style="min-height: 1rem; max-height: 5rem;">
                                     <div class="card-text task-description">
                                         @php
-                                            $description = preg_replace('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i', '', $item->description);
-                                            $description = preg_replace('/(on\w+\s*=)/i', '', $description);
-                                            echo $description;
+                                            if (!empty($item->description)) {
+                                                $description = preg_replace('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/i', '', $item->description);
+                                                $description = preg_replace('/(on\w+\s*=)/i', '', $description);
+                                                echo $description;
+                                            }
                                         @endphp
                                     </div>
                                     <div class="position-absolute bottom-0 w-100 continue-block" style="background: linear-gradient(to bottom, transparent, white); height: 2em">
@@ -188,8 +190,3 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    {{-- <script defer src="{{ url('libraries/ckeditor5-39.0.1/build/ckeditor.js') }}"></script>
-    <script src="{{ url('assets/js/user/task/form.js') }}"></script> --}}
-@endpush

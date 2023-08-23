@@ -33,13 +33,21 @@ class TaskSeeder extends Seeder
         $endTime = intval(strtotime($endTime->format('Y-m-d H:i:s')));
 
         for ($i=0; $i < 10000; $i++) { 
+            $start_time = rand(1, 1693000000);
+
+            $end_time = rand(1, 1700000000);
+
+            while ($start_time > $end_time) {
+                $end_time = rand(1, 1700000000);
+            }
+            
             DB::table('tasks')->insert([
                 'id' => Str::uuid(),
                 'user_id' => $user->id,
                 'title' => Str::random(10),
                 'description' => Str::random(500),
-                'start_time' => rand(1, 1693000000),
-                'end_time' => rand(1, 1700000000),
+                'start_time' => $start_time,
+                'end_time' => $end_time,
                 'created_at' => rand($startTime, $endTime)
             ]);
         }
