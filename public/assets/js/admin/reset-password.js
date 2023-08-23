@@ -1,18 +1,18 @@
-function setID() {
-    $('input[name="id"]').val('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, 
-            v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    }));
-}
+var resetSuccessURL = '';
 
 setTimeout(function() {
-    setID();
+    resetSuccessURL += $('meta[name="base-url"]').attr('content');
+
+    if (resetSuccessURL.substring(resetSuccessURL.length - 1) === '/') {
+        resetSuccessURL += 'admin';
+    } else {
+        resetSuccessURL += '/admin';
+    }
 
     $('#submitButton').removeAttr('disabled');
 }, 100);
 
-$('#registerForm').submit(function (event) {
+$('#resetPasswordForm').submit(function (event) {
     event.preventDefault();
 
     $('#validationErrorMessageList').html('');
@@ -24,34 +24,25 @@ $('#registerForm').submit(function (event) {
     $('#loader').removeClass('d-none');
 
     var data = {
-        id: $('input[name="id"]').val(),
-        name: $('input[name="name"]').val(),
-        username: $('input[name="username"]').val(),
-        email: $('input[name="email"]').val(),
         password: $('input[name="password"]').val(),
-        password_confirmation: $('input[name="password_confirmation"]').val(),
+        password_confirmation: $('input[name="password_confirmation"]').val()
     };
 
     $.ajax({
-        url: $(this).attr('action'),
+        url: window.location.href + window.location.search,
         type: 'POST',
         data: JSON.stringify(data),
         contentType: 'application/json',
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
-        success: function (data, textStatus, jqXHR) {
-            $('#successAlertForm').html('Berhasil melakukan pendaftaran. Silahkan periksa email kamu untuk mengaktifkan akun.');
+        success: function () {
+            $('#successAlertForm').html('Berhasil mengubah kata sandi. Kamu akan dialihkan ke halaman Login.');
             $('#successAlertForm').removeClass('d-none');
             
             $('#loader').addClass('d-none');
 
-            setID();
-
             // Kosongkan formulir
-            $('input[name="name"]').val('');
-            $('input[name="username"]').val('');
-            $('input[name="email"]').val('');
             $('input[name="password"]').val('');
             $('input[name="password_confirmation"]').val('');
 
@@ -62,9 +53,13 @@ $('#registerForm').submit(function (event) {
                 $('html').animate({
                     scrollTop: topPos
                 });
+
+                setTimeout(function () {
+                    window.location.href = resetSuccessURL;    
+                }, 2000);
             }, 200);
         },
-        error: function (jqXHR, textStatus, errorThrown) {
+        error: function (jqXHR) {
             // Validation error
             if (jqXHR.status === 422) {
                 var errorHTML = '';
@@ -87,7 +82,7 @@ $('#registerForm').submit(function (event) {
             }
 
             if (jqXHR.status !== 422 && jqXHR.status !== 429 && jqXHR.status !== 419) {
-                $('#validationErrorMessageList').html('<li>Gagal melakukan pendaftaran.</li>');
+                $('#validationErrorMessageList').html('<li>Gagal melakukan perubahan kata sandi.</li>');
             }
 
             $('#validationErrorMessageColumn').removeClass('d-none');

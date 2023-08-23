@@ -43,6 +43,7 @@ class EmailVerification extends Mailable
         $data['token'] = $this->token;
 
         return $this->from(env('MAIL_FROM_ADDRESS'), $data['application']->name)
-                    ->view('emails.users.verification', $data);
+                    ->view('emails.users.verification', $data)
+                    ->subject('Verifikasi Email');
     }
 }

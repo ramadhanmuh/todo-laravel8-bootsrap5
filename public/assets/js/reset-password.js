@@ -1,4 +1,14 @@
+var resetSuccessURL = '';
+
 setTimeout(function() {
+    resetSuccessURL += $('meta[name="base-url"]').attr('content');
+
+    if (resetSuccessURL.substring(resetSuccessURL.length - 1) === '/') {
+        resetSuccessURL += 'login';
+    } else {
+        resetSuccessURL += '/login';
+    }
+
     $('#submitButton').removeAttr('disabled');
 }, 100);
 
@@ -45,7 +55,7 @@ $('#resetPasswordForm').submit(function (event) {
                 });
 
                 setTimeout(function () {
-                    window.location.href = $('meta[name="base-url"]').attr('content') + '/login';    
+                    window.location.href = resetSuccessURL;    
                 }, 2000);
             }, 200);
         },

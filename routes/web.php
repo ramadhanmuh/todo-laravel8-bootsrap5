@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ForgotPasswordController as AdminForgotPasswordController;
 use App\Http\Controllers\Admin\LogoutController as AdminLogoutController;
+use App\Http\Controllers\Admin\ResetPasswordController as AdminResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,6 +130,17 @@ Route::prefix('admin')->group(function () {
                                                 Route::get('/', 'show')->name('show');
                                                 Route::post('/', 'send')->name('send');
                                         });
+                                });
+                        });
+
+                        Route::prefix('reset-password')->group(function () {
+                                Route::name('reset-password.')->group(function () {
+                                        Route::get('/', [AdminResetPasswordController::class, 'show'])
+                                                ->name('show');
+                        
+                                        Route::post('/', [AdminResetPasswordController::class, 'save'])
+                                                ->name('save')
+                                                ->middleware(['throttle:3,5']);
                                 });
                         });
                 });

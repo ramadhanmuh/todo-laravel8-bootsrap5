@@ -15,16 +15,18 @@ class ForgotPassword extends Mailable
 
     public $email;
     public $token;
+    public $url;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($email, $token)
+    public function __construct($email, $token, $url)
     {
         $this->email = $email;
         $this->token = $token;
+        $this->url = $url;
     }
 
     /**
@@ -40,8 +42,10 @@ class ForgotPassword extends Mailable
 
         $data['email'] = $this->email;
         $data['token'] = $this->token;
+        $data['url'] = $this->url;
 
         return $this->from(env('MAIL_FROM_ADDRESS'), $data['application']->name)
-                    ->view('emails.users.forgot-password', $data);
+                    ->view('emails.users.forgot-password', $data)
+                    ->subject('Lupa Kata Sandi');
     }
 }

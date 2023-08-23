@@ -1,4 +1,14 @@
+var loginSuccessURL = '';
+
 setTimeout(function() {
+    loginSuccessURL += $('meta[name="base-url"]').attr('content');
+
+    if (loginSuccessURL.substring(loginSuccessURL.length - 1) === '/') {
+        loginSuccessURL += 'user/home';
+    } else {
+        loginSuccessURL += '/user/home';
+    }
+
     $('#submitButton').removeAttr('disabled');
 }, 100);
 
@@ -20,7 +30,7 @@ $('#loginForm').submit(function (event) {
     };
 
     $.ajax({
-        url: $('meta[name="base-url"]').attr('content') + '/login',
+        url: $(this).attr('action'),
         type: 'POST',
         data: JSON.stringify(data),
         contentType: 'application/json',
@@ -47,7 +57,7 @@ $('#loginForm').submit(function (event) {
                 });
 
                 setTimeout(function () {
-                    window.location.href = $('meta[name="base-url"]').attr('content') + '/user/home';    
+                    window.location.href = loginSuccessURL;    
                 }, 1000);
             }, 200);
 

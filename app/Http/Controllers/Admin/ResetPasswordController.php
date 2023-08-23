@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -24,7 +25,7 @@ class ResetPasswordController extends Controller
             return DB::table('applications')->first();
         });
 
-        return view('pages.auth.reset-password', $data);
+        return view('pages.admin.auth.reset-password', $data);
     }
 
     public function save(Request $request) {
@@ -51,7 +52,6 @@ class ResetPasswordController extends Controller
         }
 
         $updateUser = DB::table('users')->where('email', '=', $params['email'])
-                                        ->where('role', '=', 'User')
                                         ->update([
                                             'password' => Hash::make($validated['password'])
                                         ]);
@@ -69,8 +69,8 @@ class ResetPasswordController extends Controller
                             ->select('a.email')
                             ->where('a.email', '=', $params['email'])
                             ->where('a.token', '=', $params['token'])
-                            ->whereNotNull('b.email_verified_at')
-                            ->where('b.role', '=', 'User')
+                            ->where('b.role', '=', 'Administrator')
+                            ->whereNotNull('email_verified_at')
                             ->first();
 
         if (empty($passwordReset)) {

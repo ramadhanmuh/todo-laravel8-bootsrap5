@@ -22,13 +22,17 @@ class ForgotPasswordController extends Controller
     public function send(ForgotPasswordRequest $request) {
         $email = $request->email;
         $token = Str::random(40);
+        $url = route('reset-password.show', [
+            'email' => $email,
+            'token' => $token
+        ]);
 
         DB::table('password_resets')->insert([
             'email' => $email,
             'token' => $token
         ]);
 
-        Mail::to($email)->send(new ForgotPassword($email, $token));
+        Mail::to($email)->send(new ForgotPassword($email, $token, $url));
 
         return response()->json([
             'success' => true
