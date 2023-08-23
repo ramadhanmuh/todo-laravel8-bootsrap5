@@ -12,6 +12,10 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
 use App\Http\Controllers\User\ChangePasswordController as UserChangePasswordController;
 use App\Http\Controllers\User\TaskController as UserTaskController;
+use App\Http\Controllers\Admin\LoginController as AdminLoginController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ForgotPasswordController as AdminForgotPasswordController;
+use App\Http\Controllers\Admin\LogoutController as AdminLogoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +107,42 @@ Route::prefix('user')->group(function () {
                         });
 
                         Route::resource('tasks', UserTaskController::class);
+                });
+
+        });
+});
+
+Route::prefix('admin')->group(function () {
+        Route::name('admin.')->group(function () {
+                Route::middleware('loggedoutadmin')->group(function () {
+                        Route::controller(AdminLoginController::class)->group(function () {
+                                Route::name('login.')->group(function () {
+                                        Route::get('/', 'show')->name('show');
+                                        Route::post('/', 'authenticate')->name('authenticate')
+                                                                        ->middleware('throttle:5,5');
+                                });
+                        });
+
+                        Route::prefix('forgot-password')->group(function () {
+                                Route::name('forgot-password.')->group(function () {
+                                        Route::controller(AdminForgotPasswordController::class)->group(function () {
+                                                Route::get('/', 'show')->name('show');
+                                                Route::post('/', 'send')->name('send');
+                                        });
+                                });
+                        });
+                });
+
+                Route::middleware('adminisloggedin')->group(function () {
+                        Route::prefix('dashboard')->group(function () {
+                                Route::name('dashboard.')->group(function () {
+                                        Route::controller(AdminDashboardController::class)->group(function () {
+                                                Route::get('/', 'index')->name('index');
+                                        });
+                                });
+                        });
+
+                        Route::post('logout', AdminLogoutController::class)->name('logout');
                 });
 
         });

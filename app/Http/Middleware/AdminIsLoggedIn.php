@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class UserIsLoggedIn
+class AdminIsLoggedIn
 {
     /**
      * Handle an incoming request.
@@ -17,16 +17,17 @@ class UserIsLoggedIn
      */
     public function handle(Request $request, Closure $next)
     {
-        $session = session('userAuth', null);
+        $session = session('adminAuth', null);
 
         if (empty($session)) {
-            $remember_token = $request->cookie('userAuth');
+            $remember_token = $request->cookie('adminAuth');
 
             if (empty($remember_token)) {
-                return redirect()->route('login.show');
+                return redirect()->route('admin.login.show');
             }
 
             $user = DB::table('users')->select('id', 'name', 'username')
+                                        ->where('role', '=', 'Administrator')
                                         ->where('remember_token', '=', $remember_token)
                                         ->first();
 
@@ -34,7 +35,7 @@ class UserIsLoggedIn
                 return redirect()->route('login.show');
             }
 
-            session(['userAuth' => $user]);
+            session(['adminAuth' => $user]);
         } else {
             $user = DB::table('users')->select('id', 'name', 'username')
                                         ->where('id', '=', $session->id)
@@ -45,7 +46,7 @@ class UserIsLoggedIn
             }
         }
 
-        $request->attributes->add(['userAuth' => $user]);
+        $request->attributes->add(['adminAuth' => $user]);
 
         return $next($request);
     }

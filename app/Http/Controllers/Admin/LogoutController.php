@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -17,13 +17,13 @@ class LogoutController extends Controller
      */
     public function __invoke(Request $request)
     {
-        DB::table('users')->where('id', '=', session('userAuth')->id)
+        DB::table('users')->where('id', '=', session('adminAuth')->id)
                             ->update(['remember_token' => null]);
 
-        session()->forget('userAuth');
+        $request->session()->forget('adminAuth');
 
         Cookie::forget('adminAuth');
 
-        return redirect()->route('home');
+        return redirect()->route('admin.login.show');
     }
 }

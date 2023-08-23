@@ -21,6 +21,7 @@ class LoggedOutUser
             $remember_token = $request->cookie('userAuth');
 
             $user = DB::table('users')->select('id', 'name', 'username')
+                                        ->where('role', 'User')
                                         ->where('remember_token', '=', $remember_token)
                                         ->first();
 
@@ -29,7 +30,10 @@ class LoggedOutUser
     
                 return redirect()->route('user.home');
             }
+        } else {
+            return redirect()->route('user.home');
         }
+
         return $next($request);
     }
 }
