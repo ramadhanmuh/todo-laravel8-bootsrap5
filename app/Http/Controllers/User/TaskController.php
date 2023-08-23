@@ -65,6 +65,12 @@ class TaskController extends Controller
 
         Cache::forever('seeTaskList', $data['input']);
 
+        if (empty($data['items']) && $data['input']['page'] > 1) {
+            $data['input']['page'] = 1;
+            
+            return redirect()->route('user.tasks.index', $data['input']);
+        }
+
         return view('pages.user.task.index', $data);
     }
 
