@@ -63,6 +63,8 @@ class TaskController extends Controller
             }
         }
 
+        Cache::forever('seeTaskList', $data['input']);
+
         return view('pages.user.task.index', $data);
     }
 
@@ -429,7 +431,13 @@ class TaskController extends Controller
             $request->session()->flash('taskProcessFailed', 'Gagal mengubah tugas.');
         }
 
-        return redirect()->route('user.tasks.index');
+        $seeList = Cache::get('seeTaskList');
+
+        if (empty($seeList)) {
+            return redirect()->route('user.tasks.index');
+        }
+
+        return redirect()->route('user.tasks.index', $seeList);
     }
 
     /**
@@ -438,8 +446,19 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
-        //
+        $process = DB::table('tasks')->where('user_id', '=', $request->get('userAuth')->id)
+                                    ->where('id', '=', $id)
+                                    ->delete();
+
+        if ($process) {
+            $request->session()->flash('taskProcessSuccessfully', 'Berhasil menghapus tugas.');
+            Cache::forever('taskManaged' . $request->get('userAuth')->id, time());
+        } else {
+            $request->session()->flash('taskProcessFailed', 'Gagal menghapus tugas.');
+        }
+
+        return redirect()->back();
     }
 }
