@@ -20,6 +20,12 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
+        // $newDateTime = new DateTime($data['input']['year'] . '-01-01 00:00:00');
+        //     $newDateTime->setTimezone(new DateTimeZone('UTC'));
+        //     $startTime = $newDateTime->format('Y-m-d H:i:s');
+
+        // dd(gmdate("Y-m-d\TH:i:s\Z", 1692810000), gmdate('Y-m-d H:i:s', strtotime(date('Y-m-d'))));
+
         $data['application'] = Cache::rememberForever('application', function () {
             return DB::table('applications')->first();
         });
@@ -199,48 +205,6 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        $errors = [];
-
-        $start_time = $request->start_date;
-
-        if (!empty($start_time)) {
-            if (empty($request->start_time)) {
-                $start_time .= ' 00:00:00';
-            } else {
-                $start_time .= ' ' . $request->start_time;
-            }
-
-            $start_time = strtotime($start_time);
-        }
-
-        if ($start_time === false) {
-            $errors['start_time'] = 'The Start Time could not be created.';
-        }
-
-        $end_time = $request->end_date;
-
-        if (!empty($end_time)) {
-            if (empty($request->end_time)) {
-                $end_time .= ' 00:00:00';
-            } else {
-                $end_time .= ' ' . $request->end_time;
-            }
-
-            $end_time = strtotime($end_time);
-        }
-
-        if ($end_time === false) {
-            $errors['end_time'] = 'The End Time could not be created.';
-        }
-
-        if ((!empty($start_time) && !empty($end_time)) && ($start_time > $end_time)) {
-            $errors['end_time'] = 'The Start Time needs to be more than equal to the End Time.';
-        }
-
-        if (count($errors) > 0) {
-            return back()->withInput($request->all())->withErrors($errors);
-        }
-
         $currentTime = time();
 
         $input = [
@@ -248,8 +212,8 @@ class TaskController extends Controller
             'user_id' => $request->get('userAuth')->id,
             'title' => $request->title,
             'description' => $request->description,
-            'start_time' => $start_time,
-            'end_time' => $end_time,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
             'created_at' => $currentTime,
             'updated_at' => null
         ];

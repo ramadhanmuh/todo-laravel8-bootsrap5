@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -45,7 +45,7 @@ class ProfileController extends Controller
     }
 
     public function update(UpdateProfileRequest $request) {
-        $input = $request->safe()->except(['password']);
+        $input = $request->validated();
 
         $input['updated_at'] = time();
 

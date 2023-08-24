@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UpdateProfileRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class UpdateProfileRequest extends FormRequest
      */
     public function rules()
     {
-        $user = DB::table('users')->select('username', 'email')
+        $user = DB::table('users')->select('username', 'email', 'password')
                                     ->where('id', '=', session('userAuth')->id)
                                     ->where('role', '=', 'User')
                                     ->first();
@@ -34,30 +35,38 @@ class UpdateProfileRequest extends FormRequest
                 'required', 'string', 'max:255'
             ],
             'username' => [
-                'required', 'string', 'max:191',
+                'required', 'string', 'max:191', 'alpha_dash',
                 function ($attribute, $value, $fail) use ($user) {
                     if ($value !== $user->username) {
                         $user = DB::table('users')->select('id')
                                                     ->where('username', '=', $value)
                                                     ->first();
     
-                        if (empty($user)) {
+                        if (!empty($user)) {
                             $fail('The '.$attribute.' has been used.');
                         }
                     }
                 }
             ],
             'email' => [
-                'required', 'string', 'max:191',
+                'required', 'email', 'max:191',
                 function ($attribute, $value, $fail) use ($user) {
                     if ($value !== $user->email) {
                         $user = DB::table('users')->select('id')
                                                     ->where('email', '=', $value)
                                                     ->first();
     
-                        if (empty($user)) {
+                        if (!empty($user)) {
                             $fail('The '.$attribute.' has been used.');
                         }
+                    }
+                }
+            ],
+            'password' => [
+                'required', 'string', 'max:255',
+                function ($attribute, $value, $fail) use ($user) {
+                    if (!Hash::check($value, $user->password)) {
+                        $fail('The '.$attribute.' is wrong.');
                     }
                 }
             ]

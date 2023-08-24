@@ -158,6 +158,11 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'string_start_date' => 'Start Date',
+        'string_start_time' => 'Start Time',
+        'string_end_date' => 'End Date',
+        'string_end_time' => 'End Time',
+    ],
 
 ];

@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ForgotPasswordController as AdminForgotPasswordController;
 use App\Http\Controllers\Admin\LogoutController as AdminLogoutController;
 use App\Http\Controllers\Admin\ResetPasswordController as AdminResetPasswordController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -146,6 +147,8 @@ Route::prefix('admin')->group(function () {
                 });
 
                 Route::middleware('adminisloggedin')->group(function () {
+                        Route::post('logout', AdminLogoutController::class)->name('logout');
+
                         Route::prefix('dashboard')->group(function () {
                                 Route::name('dashboard.')->group(function () {
                                         Route::controller(AdminDashboardController::class)->group(function () {
@@ -156,7 +159,15 @@ Route::prefix('admin')->group(function () {
                                 });
                         });
 
-                        Route::post('logout', AdminLogoutController::class)->name('logout');
+                        Route::prefix('profile')->group(function () {
+                                Route::name('profile.')->group(function () {
+                                        Route::controller(AdminProfileController::class)->group(function () {
+                                                Route::get('/', 'index')->name('index');
+                                                Route::get('edit', 'edit')->name('edit');
+                                                Route::put('edit', 'update')->name('update');
+                                        });
+                                });
+                        });
                 });
 
         });

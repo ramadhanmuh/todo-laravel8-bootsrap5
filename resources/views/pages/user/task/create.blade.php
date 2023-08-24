@@ -34,21 +34,23 @@
                     <label for="description" class="form-label">Deskripsi</label>
                     <textarea name="description" id="description" name="description" class="form-control" rows="3">{{ old('description') }}</textarea>
                 </div>
+                <input type="hidden" name="start_time" value="{{ old('start_time') }}">
+                <input type="hidden" name="end_time" value="{{ old('end_time') }}">
                 <div class="col-md-3 mb-3">
                     <label for="start_date" class="form-label">Tanggal Mulai</label>
-                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ old('start_date') }}">
+                    <input type="date" class="form-control" id="start_date" name="string_start_date" value="{{ old('string_start_date') }}">
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="start_time" class="form-label">Waktu Mulai</label>
-                    <input type="time" class="form-control" id="start_time" name="start_time" value="{{ old('start_time') }}">
+                    <input type="time" class="form-control" id="start_time" name="string_start_time" value="{{ old('string_start_time') }}">
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="end_date" class="form-label">Tanggal Berakhir</label>
-                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ old('end_date') }}">
+                    <input type="date" class="form-control" id="end_date" name="string_end_date" value="{{ old('string_end_date') }}">
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="end_time" class="form-label">Waktu Berakhir</label>
-                    <input type="time" class="form-control" id="end_time" name="end_time" value="{{ old('end_time') }}">
+                    <input type="time" class="form-control" id="end_time" name="string_end_time" value="{{ old('string_end_time') }}">
                 </div>
                 <div class="col-12">
                     <div class="row">
