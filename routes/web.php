@@ -150,6 +150,8 @@ Route::prefix('admin')->group(function () {
                                 Route::name('dashboard.')->group(function () {
                                         Route::controller(AdminDashboardController::class)->group(function () {
                                                 Route::get('/', 'index')->name('index');
+                                                Route::get('total-tasks-daily', 'getTotalTodayTasks')->name('totalTasksDaily');
+                                                Route::get('total-tasks-monthly', 'getCurrentMonthTotalTasks')->name('totalTasksMonthly');
                                         });
                                 });
                         });

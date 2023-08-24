@@ -8,7 +8,7 @@
     <div class="col-11 col-md-5 col-lg-4 col-xl-3 shadow border p-3 bg-white">
         <h1 class="text-center mb-3">{{ $application->name }}</h1>
         <p>{{ $application->description }}</p>
-        <div class="row justify-content-between w-100">
+        <div class="row justify-content-between">
             <div class="col-auto">
                 <a href="{{ route('login.show') }}" class="btn btn-primary">
                     Login
