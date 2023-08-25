@@ -29,30 +29,23 @@ class UpdateTaskRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:16777215'],
-            'start_date' => ['nullable', 'string', 'date'],
-            'start_time' => [
-                'nullable', 'string', 'date_format:H:i',
-                function ($attribute, $value, $fail) use ($start_date) {
-                    if (empty($start_date) && !empty($value)) {
-                        $fail('The Start Date is required.');
-                    }
-                },
+            'string_start_date' => [
+                'nullable', 'date'
             ],
-            'end_date' => [
-                'nullable', 'string', 'date',
-                function ($attribute, $value, $fail) use ($start_date) {
-                    if (empty($start_date) && !empty($value)) {
-                        $fail('The Start Date is required.');
-                    }
-                },
+            'string_start_time' => [
+                'nullable', 'date_format:H:i'
+            ],
+            'string_end_date' => [
+                'nullable', 'date'
+            ],
+            'string_end_time' => [
+                'nullable', 'date_format:H:i'
+            ],
+            'start_time' => [
+                'nullable'
             ],
             'end_time' => [
-                'nullable', 'string', 'date_format:H:i',
-                function ($attribute, $value, $fail) use ($end_date) {
-                    if (empty($end_date) && !empty($value)) {
-                        $fail('The End Date is required.');
-                    }
-                },
+                'nullable'
             ]
         ];
     }

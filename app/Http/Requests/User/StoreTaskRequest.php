@@ -30,29 +30,22 @@ class StoreTaskRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:16777215'],
             'string_start_date' => [
-                'required_with_all:string_start_time,string_end_date,string_end_time',
-                'date'
+                'nullable', 'date'
             ],
             'string_start_time' => [
                 'nullable', 'date_format:H:i'
             ],
             'string_end_date' => [
-                'required_with_all:string_start_time', 'date'
+                'nullable', 'date'
             ],
             'string_end_time' => [
                 'nullable', 'date_format:H:i'
             ],
             'start_time' => [
-                'nullable', 'numeric', 'max:146011735807', 'min:0'
+                'nullable'
             ],
             'end_time' => [
-                'required_with_all:start_time', 'numeric', 'max:146011735807', 'min:0',
-                'gte:start_time',
-                // function ($attribute, $value, $fail) use ($start_time) {
-                //     if (empty($start_time) && !empty($value)) {
-                //         $fail('The ' . $attribute . ' is required.');
-                //     }
-                // },
+                'nullable'
             ]
         ];
     }

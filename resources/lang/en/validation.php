@@ -159,10 +159,10 @@ return [
     */
 
     'attributes' => [
-        'string_start_date' => 'Start Date',
-        'string_start_time' => 'Start Time',
-        'string_end_date' => 'End Date',
-        'string_end_time' => 'End Time',
+        'string_start_date' => 'start date',
+        'string_start_time' => 'start time',
+        'string_end_date' => 'end date',
+        'string_end_time' => 'end time',
     ],
 
 ];

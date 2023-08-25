@@ -1,3 +1,11 @@
+function convertInputDateTimeToUNIX(dateTime) {
+	var newDate = new Date(dateTime);
+
+	var unixTimestamp = Math.floor(newDate.getTime() / 1000);
+
+	return unixTimestamp;
+}
+
 $('input[name="id"]').val('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0, 
         v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -27,34 +35,59 @@ $('#start_date').change(function () {
 
 	var dateTime = date + ' ' + time;
 
-	var newDate = new Date(dateTime);
+	var unixTimestamp = convertInputDateTimeToUNIX(dateTime);
 
-	var UTCString = newDate.toUTCString();
+	$('input[name="start_time"]').val(unixTimestamp);
+});
 
-	var unix = new Date(UTCString).getTime() / 1000;
+$('#start_time').change(function () {
+	var time = $(this).val(),
+		date = $('#start_date').val();
 
-	// console.log(newDate.toISOString())
+	if (time.length === 0 || date.length === 0) {
+		$('input[name="start_time"]').val('');
+		return;
+	}
 
-	// var utcDate = new Date(
-    //     Date.UTC(
-    //       newDate.getUTCFullYear(),
-    //       newDate.getUTCMonth(),
-    //       newDate.getUTCDate(),
-    //       newDate.getUTCHours(),
-    //       newDate.getUTCMinutes(),
-    //       newDate.getUTCSeconds()
-    //     )
-	// );
+	var dateTime = date + ' ' + time + ':00';
 
-	console.log(unix);
-	console.log(new Date(unix * 1000).toLocaleDateString('id-ID'));
-	console.log(new Date(unix * 1000).getHours());
+	var unixTimestamp = convertInputDateTimeToUNIX(dateTime);
 
-	// newDate = newDate.getUTCSeconds();
+	$('input[name="start_time"]').val(unixTimestamp);
+});
 
-	// $('input[name="start_time"]').val(new Date(dateTime).getTime());
-	
-	// console.log(newDate);
-	// console.log(new Date(newDate).toLocaleDateString('id-ID'));
+$('#end_date').change(function () {
+	var date = $(this).val(),
+		time = $('#end_time').val();
 
+	if (date.length === 0) {
+		$('input[name="end_time"]').val('');
+		return;
+	}
+
+	if (time.length === 0) {
+		time += '00:00:00';
+	}
+
+	var dateTime = date + ' ' + time;
+
+	var unixTimestamp = convertInputDateTimeToUNIX(dateTime);
+
+	$('input[name="end_time"]').val(unixTimestamp);
+});
+
+$('#end_time').change(function () {
+	var time = $(this).val(),
+		date = $('#end_date').val();
+
+	if (time.length === 0 || date.length === 0) {
+		$('input[name="end_time"]').val('');
+		return;
+	}
+
+	var dateTime = date + ' ' + time + ':00';
+
+	var unixTimestamp = convertInputDateTimeToUNIX(dateTime);
+
+	$('input[name="end_time"]').val(unixTimestamp);
 });

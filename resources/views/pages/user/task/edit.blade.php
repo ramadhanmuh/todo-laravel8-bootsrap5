@@ -36,20 +36,22 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="start_date" class="form-label">Tanggal Mulai</label>
-                    <input type="date" class="form-control unix-date" id="start_date" name="start_date" data-value="{{ empty(old('start_date')) ? $item->start_time : old('start_date') }}">
+                    <input type="date" class="form-control unix-date" id="start_date" name="string_start_date" data-value="{{ empty(old('string_start_date')) ? $item->start_time : old('string_start_date') }}">
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="start_time" class="form-label">Waktu Mulai</label>
-                    <input type="time" class="form-control unix-time" id="start_time" name="start_time" data-value="{{ empty(old('start_time')) ? $item->start_time : old('start_time') }}">
+                    <input type="time" class="form-control unix-time" id="start_time" name="string_start_time" data-value="{{ empty(old('string_start_time')) ? $item->start_time : old('string_start_time') }}">
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="end_date" class="form-label">Tanggal Berakhir</label>
-                    <input type="date" class="form-control unix-date" id="end_date" name="end_date" data-value="{{ empty(old('end_date')) ? $item->end_time : old('end_date') }}">
+                    <input type="date" class="form-control unix-date" id="end_date" name="string_end_date" data-value="{{ empty(old('string_end_date')) ? $item->end_time : old('string_end_date') }}">
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="end_time" class="form-label">Waktu Berakhir</label>
-                    <input type="time" class="form-control unix-time" id="end_time" name="end_time" data-value="{{ empty(old('end_time')) ? $item->end_time : old('end_time') }}">
+                    <input type="time" class="form-control unix-time" id="end_time" name="string_end_time" data-value="{{ empty(old('string_end_time')) ? $item->end_time : old('string_end_time') }}">
                 </div>
+                <input type="hidden" name="start_time" value="{{ empty(old('start_time')) ? $item->start_time : old('start_time')  }}">
+                <input type="hidden" name="end_time" value="{{ empty(old('end_time')) ? $item->start_time : old('start_time')  }}">
                 <div class="col-12">
                     <div class="row">
                         <div class="col-auto">
