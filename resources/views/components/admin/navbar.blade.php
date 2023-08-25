@@ -9,13 +9,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link {{ $navbarActive === 'dashboard' ? 'active' : '' }}" href="{{ route('user.home') }}">Dashboard</a>
+                    <a class="nav-link {{ $navbarActive === 'dashboard' ? 'active' : '' }}" href="{{ route('admin.dashboard.index') }}">Dashboard</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ $navbarActive === 'users' ? 'active' : '' }}" href="{{ route('user.tasks.index') }}">Pengguna</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ $navbarActive === 'application' ? 'active' : '' }}" href="{{ route('user.tasks.index') }}">Aplikasi</a>
+                    <a class="nav-link {{ $navbarActive === 'application' ? 'active' : '' }}" href="{{ route('admin.application.index') }}">Aplikasi</a>
                 </li>
             </ul>
             <div class="mt-2 mt-lg-0">
@@ -23,8 +23,8 @@
                     {{ request()->get('adminAuth')->username }}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end">
-                    <li><a class="dropdown-item {{ $navbarActive === 'profile' ? 'active' : '' }}" href="{{ route('user.profile.index') }}">Profil</a></li>
-                    <li><a class="dropdown-item {{ $navbarActive === 'change-password' ? 'active' : '' }}" href="{{ route('user.change-password.edit') }}">Ubah Kata Sandi</a></li>
+                    <li><a class="dropdown-item {{ $navbarActive === 'profile' ? 'active' : '' }}" href="{{ route('admin.profile.index') }}">Profil</a></li>
+                    <li><a class="dropdown-item {{ $navbarActive === 'change-password' ? 'active' : '' }}" href="{{ route('admin.change-password.edit') }}">Ubah Kata Sandi</a></li>
                     <li>
                         <form class="dropdown-item" action="{{ route('admin.logout') }}" method="POST">
                             @csrf

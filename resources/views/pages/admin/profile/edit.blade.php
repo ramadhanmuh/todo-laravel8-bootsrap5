@@ -1,8 +1,8 @@
-@extends('layouts.user')
+@extends('layouts.admin')
 
-@section('title', 'User - Profil - Ubah')
+@section('title', 'Administrator - Profil - Ubah')
 
-@section('description', 'Halaman yang menampilkan formulir pengubahan profil pengguna.')
+@section('description', 'Halaman yang menampilkan formulir pengubahan profil administrator.')
 
 @section('content')
     <div class="col-11 shadow border p-3 bg-white align-self-start">
@@ -41,7 +41,7 @@
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ route('user.profile.index') }}" class="btn btn-light border border-dark">
+                    <a href="{{ route('admin.profile.index') }}" class="btn btn-light border border-dark">
                         Kembali
                     </a>
                 </div>

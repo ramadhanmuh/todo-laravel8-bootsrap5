@@ -51,7 +51,7 @@
                     <input type="time" class="form-control unix-time" id="end_time" name="string_end_time" data-value="{{ empty(old('string_end_time')) ? $item->end_time : old('string_end_time') }}">
                 </div>
                 <input type="hidden" name="start_time" value="{{ empty(old('start_time')) ? $item->start_time : old('start_time')  }}">
-                <input type="hidden" name="end_time" value="{{ empty(old('end_time')) ? $item->start_time : old('start_time')  }}">
+                <input type="hidden" name="end_time" value="{{ empty(old('end_time')) ? $item->end_time : old('end_time')  }}">
                 <div class="col-12">
                     <div class="row">
                         <div class="col-auto">

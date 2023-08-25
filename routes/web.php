@@ -18,6 +18,9 @@ use App\Http\Controllers\Admin\ForgotPasswordController as AdminForgotPasswordCo
 use App\Http\Controllers\Admin\LogoutController as AdminLogoutController;
 use App\Http\Controllers\Admin\ResetPasswordController as AdminResetPasswordController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Admin\ChangePasswordController as AdminChangePasswordController;
+use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
+use App\Http\Controllers\Admin\UserControler as AdminUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -168,6 +171,32 @@ Route::prefix('admin')->group(function () {
                                         });
                                 });
                         });
+
+                        Route::prefix('change-password')->group(function () {
+                                Route::controller(AdminChangePasswordController::class)->group(function () {
+                                        Route::name('change-password.')->group(function () {
+                                                Route::get('/', 'edit')
+                                                        ->name('edit');
+                                                Route::put('edit', 'update')
+                                                        ->name('update');
+                                        });
+                                });
+                        });
+
+                        Route::prefix('application')->group(function () {
+                                Route::controller(AdminApplicationController::class)->group(function () {
+                                        Route::name('application.')->group(function () {
+                                                Route::get('/', 'index')
+                                                        ->name('index');
+                                                Route::get('edit', 'edit')
+                                                        ->name('edit');
+                                                Route::put('edit', 'update')
+                                                        ->name('update');
+                                        });
+                                });
+                        });
+
+                        Route::resource('users', AdminUserController::class);
                 });
 
         });

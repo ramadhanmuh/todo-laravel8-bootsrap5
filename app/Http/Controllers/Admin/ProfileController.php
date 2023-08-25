@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\User\UpdateProfileRequest;
+use App\Http\Requests\Admin\UpdateProfileRequest;
 use stdClass;
 
 class ProfileController extends Controller
@@ -18,13 +18,13 @@ class ProfileController extends Controller
         $data['profile'] = DB::table('users')->select([
             'name', 'username', 'email', 'created_at', 'updated_at'
         ])
-        ->where('id', '=', session('userAuth')->id)
-        ->where('role', '=', 'User')
+        ->where('id', '=', session('adminAuth')->id)
+        ->where('role', '=', 'Administrator')
         ->first();
 
         $data['navbarActive'] = 'profile';
 
-        return view('pages.user.profile.index', $data);
+        return view('pages.admin.profile.index', $data);
     }
 
     public function edit() {
@@ -35,23 +35,22 @@ class ProfileController extends Controller
         $data['user'] = DB::table('users')->select([
             'name', 'username', 'email'
         ])
-        ->where('id', '=', session('userAuth')->id)
-        ->where('role', '=', 'User')
+        ->where('id', '=', session('adminAuth')->id)
+        ->where('role', '=', 'Administrator')
         ->first();
 
         $data['navbarActive'] = 'profile';
 
-        return view('pages.user.profile.edit', $data);
+        return view('pages.admin.profile.edit', $data);
     }
 
     public function update(UpdateProfileRequest $request) {
-        $input = $request->validated();
+        $input = $request->safe()->except(['password']);
 
         $input['updated_at'] = time();
 
         $process = DB::table('users')
-                        ->where('role', '=', 'User')
-                        ->where('id', '=', session('userAuth')->id)
+                        ->where('id', '=', session('adminAuth')->id)
                         ->update($input);
 
         if (!$process) {
@@ -62,14 +61,14 @@ class ProfileController extends Controller
 
         $newSession = new stdClass;
 
-        $newSession->id = session('userAuth')->id;
+        $newSession->id = session('adminAuth')->id;
         $newSession->username = $input['username'];
         $newSession->name = $input['name'];
 
-        $request->session()->put('userAuth', $newSession);
+        $request->session()->put('adminAuth', $newSession);
         
         $request->session()->flash('profileChangedSuccessfully', 'OK');
 
-        return redirect()->route('user.profile.index');
+        return redirect()->route('admin.profile.index');
     }
 }
