@@ -20,7 +20,7 @@ use App\Http\Controllers\Admin\ResetPasswordController as AdminResetPasswordCont
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\ChangePasswordController as AdminChangePasswordController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
-use App\Http\Controllers\Admin\UserControler as AdminUserController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
 /*
 |--------------------------------------------------------------------------

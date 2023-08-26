@@ -8,7 +8,7 @@
     <div class="col-11 shadow border p-3 bg-white align-self-start">
         <h2 class="text-center mb-3">Aplikasi</h2>
         <div class="border-top pt-3">
-            @if (session('applicationeChangedSuccessfully'))
+            @if (session('applicationChangedSuccessfully'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     Berhasil mengubah informasi aplikasi.
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

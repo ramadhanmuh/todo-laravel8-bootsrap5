@@ -12,7 +12,7 @@
                     <a class="nav-link {{ $navbarActive === 'dashboard' ? 'active' : '' }}" href="{{ route('admin.dashboard.index') }}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ $navbarActive === 'users' ? 'active' : '' }}" href="{{ route('user.tasks.index') }}">Pengguna</a>
+                    <a class="nav-link {{ $navbarActive === 'users' ? 'active' : '' }}" href="{{ route('admin.users.index') }}">Pengguna</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ $navbarActive === 'application' ? 'active' : '' }}" href="{{ route('admin.application.index') }}">Aplikasi</a>
