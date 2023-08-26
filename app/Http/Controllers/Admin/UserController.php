@@ -25,8 +25,8 @@ class UserController extends Controller
         $data['input'] = [
             'page' => intval($request->page),
             'keyword' => $request->keyword,
-            'start_date_created' => intval($request->start_date_created),
-            'end_date_created' => intval($request->end_date_created),
+            'start_date_created' => $request->start_date_created,
+            'end_date_created' => $request->end_date_created,
             'role' => $request->role
         ];
 
@@ -66,7 +66,7 @@ class UserController extends Controller
     private function getListFromDatabase($data, $request) {
         $data['totalItems'] = DB::table('users');
 
-        $data['totalItems'] = $this->listQuery($data['totalItems'], $data['input'])
+        $data['totalItems'] = $this->listQuery($data['totalItems'], $data['input'], $request)
                                     ->count();
 
         $data['totalPages'] = intval(ceil($data['totalItems'] / 15));
@@ -79,7 +79,7 @@ class UserController extends Controller
 
         $data['items'] = DB::table('users');
 
-        $data['items'] = $this->listQuery($data['items'], $data['input'])
+        $data['items'] = $this->listQuery($data['items'], $data['input'], $request)
                                 ->orderBy('name', 'asc')
                                 ->offset($offset)
                                 ->limit(15)
@@ -90,23 +90,25 @@ class UserController extends Controller
         return $data;
     }
 
-    private function listQuery($db, $input) {
+    private function listQuery($db, $input, $request) {
+        $db = $db->where('id', '!=', $request->get('adminAuth')->id);
+
         if (!empty($input['role'])) {
             $db = $db->where('role', '=', $input['role']);
         }
 
         if (!empty($input['start_date_created']) && empty($input['end_date_created'])) {
-            $db = $db->where('created_at', '>=', $input['start_created_date']);
+            $db = $db->where('created_at', '>=', intval($input['start_date_created']));
         }
 
         if (empty($input['start_date_created']) && !empty($input['end_date_created'])) {
-            $db = $db->where('created_at', '>=', $input['end_created_date']);
+            $db = $db->where('created_at', '<=', intval($input['end_date_created']));
         }
 
         if (!empty($input['start_date_created']) && !empty($input['end_date_created'])) {
             $db = $db->whereBetween('created_at', [
-                $input['start_created_date'] - 1,
-                $input['end_created_date'] + 1
+                intval($input['start_date_created']) - 1,
+                intval($input['end_date_created']) + 1
             ]);
         }
 

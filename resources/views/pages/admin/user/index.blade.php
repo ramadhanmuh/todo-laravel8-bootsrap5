@@ -31,20 +31,29 @@
                     </div>
                     <div class="mb-3">
                         <label for="start_date_created" class="form-label">Tanggal Dibuat</label>
-                        <input type="date" class="form-control" id="start_date_created" data-value="{{ $input['start_date_created'] }}">
-                    </div>
-                    <div class="mb-3">
-                        <label for="end_date_created" class="form-label">Tanggal Dibuat</label>
-                        <input type="date" class="form-control" id="end_date_created" data-value="{{ $input['end_date_created'] }}">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <input type="date" class="form-control unix-value-input" id="start_date_created" data-value="{{ $input['start_date_created'] }}">
+                                <input type="hidden" name="start_date_created" value="{{ $input['start_date_created'] }}">
+                            </div>
+                            <div class="col-12 col-md-auto p-md-0 my-1 m-md-0 text-center">
+                                <span class="d-none d-md-inline">-</span>
+                                <span class="d-md-none">Sampai</span>
+                            </div>
+                            <div class="col">
+                                <input type="date" class="form-control unix-value-input" id="end_date_created" data-value="{{ $input['end_date_created'] }}">
+                                <input type="hidden" name="end_date_created" value="{{ $input['end_date_created'] }}">
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <label for="keyword">Kata Kunci</label>
-                        <input type="text" class="form-control" id="keyword" value="{{ $input['keyword'] }}" placeholder="ID, Nama, Username, Email">
+                        <input type="text" name="keyword" class="form-control" id="keyword" value="{{ $input['keyword'] }}" placeholder="ID, Nama, Username, Email">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary">Terapkan</button>
+                    <button type="submit" class="btn btn-primary">Terapkan</button>
                 </div>
             </form>
         </div>
@@ -71,7 +80,9 @@
                     </a>
                 </div>
             </div>
+            {{-- Pagination and Filter Button --}}
             <div class="row justify-content-between mb-3">
+                {{-- Pagination --}}
                 <div class="col-auto">
                     <ul class="pagination pagination-sm m-0">
                         <li class="page-item">
@@ -88,8 +99,8 @@
                             <form action="{{ route('admin.users.index') }}" method="get">
                                 <input type="hidden" name="keyword" value="{{ $input['keyword'] }}">
                                 <input type="hidden" name="role" value="{{ $input['role'] }}">
-                                <input type="hidden" name="start_date_created" value="{{ $input['start_date_created'] }}">
-                                <input type="hidden" name="end_date_created" value="{{ $input['end_date_created'] }}">
+                                <input type="hidden" class="unix-value-hidden" name="start_date_created" value="{{ $input['start_date_created'] }}">
+                                <input type="hidden" class="unix-value-hidden" name="end_date_created" value="{{ $input['end_date_created'] }}">
                                 <input type="text" id="page" class="form-control text-center form-control-sm" name="page" value="{{ $input['page'] }}">
                             </form>
                         </li>
@@ -105,41 +116,94 @@
                         </li>
                     </ul>
                 </div>
+                {{-- Filter Button --}}
                 <div class="col-auto">
                     <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" type="button" data-bs-target="#filterModal">
                         Saring
                     </button>
                 </div>
             </div>
+            {{-- List --}}
             <div class="row">
                 <div class="col-12">
+                    <b>Total:</b>
+                    {{ number_format($totalItems, 0, ',', '.') }}
+                </div>
+
+                {{-- List Card --}}
+                @forelse ($items as $item)
+                    <div class="col-12 d-md-none my-2">
+                        <div class="card w-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $item->name }}</h5>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">({{ $item->username }})</h6>
+                                <p class="card-text">{{ $item->email }}</p>
+                                <a href="{{ route('admin.users.edit', $item->id) }}" class="card-link text-decoration-none">Ubah</a>
+                                <form action="{{ route('admin.users.destroy', $item->id) }}" class="card-link d-inline" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <button class="btn text-danger p-0" type="submit" onclick="return confirm('Pengguna {{ $item->name }} ingin dihapus ?')">Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <span class="text-muted">Daftar pengguna tidak ditemukan.</span>
+                @endforelse
+
+                {{-- List Table --}}
+                <div class="col-12 d-none d-md-block">
                     <div class="table-responsive">
                         <table class="table w-100 table-bordered">
                             <thead>
                                 <tr>
-                                    <th class="text-center">ID</th>
+                                    <th class="text-center align-middle">ID</th>
                                     <th>Nama</th>
-                                    <th class="text-center">Username</th>
-                                    <th class="text-center">Email</th>
-                                    <th class="text-center">Jenis</th>
-                                    <th class="text-center">Waktu Dibuat</th>
-                                    <th class="text-center">Waktu Diubah</th>
+                                    <th class="text-center align-middle">Username</th>
+                                    <th class="text-center align-middle">Email</th>
+                                    <th class="text-center align-middle">Waktu Dibuat</th>
+                                    <th class="text-center align-middle"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($items as $item)
                                     <tr>
-                                        <td class="text-center">{{ $item->id }}</td>
-                                        <td>{{ $item->name }}</td>
-                                        <td class="text-center">{{ $item->username }}</td>
-                                        <td class="text-center">{{ $item->email }}</td>
-                                        <td class="text-center">{{ $item->role }}</td>
-                                        <td class="text-center unix-value" data-unix="{{ $item->created_at }}"></td>
-                                        <td class="text-center unix-value" data-unix="{{ $item->updated_at }}"></td>
+                                        <td class="text-center align-middle">{{ $item->id }}</td>
+                                        <td class="align-middle">
+                                            <a href="{{ route('admin.users.show', $item->id) }}" class="text-decoration-none">
+                                                {{ $item->name }}
+                                            </a>
+                                        </td>
+                                        <td class="text-center align-middle">{{ $item->username }}</td>
+                                        <td class="text-center align-middle">{{ $item->email }}</td>
+                                        <td class="text-center align-middle unix-value" data-unix="{{ $item->created_at }}"></td>
+                                        <td class="text-center align-middle">
+                                            <div class="btn-group dropstart">
+                                                <button type="button" class="btn btn-light border border-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Aksi
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a href="{{ route('admin.users.edit', $item->id) }}" class="dropdown-item">
+                                                            Ubah
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <form action="{{ route('admin.users.destroy', $item->id) }}" class="dropdown-item" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="w-100 btn text-start p-0" onclick="return confirm('Pengguna {{ $item->name }} ingin dihapus ?')">
+                                                                Hapus
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7">Daftar pengguna tidak ditemukan.</td>
+                                        <td colspan="7" class="text-muted">Daftar pengguna tidak ditemukan.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -147,6 +211,7 @@
                     </div>
                 </div>
             </div>
+            {{-- Pagination --}}
             <ul class="pagination pagination-sm m-0">
                 <li class="page-item">
                     <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
@@ -162,8 +227,8 @@
                     <form action="{{ route('admin.users.index') }}" method="get">
                         <input type="hidden" name="keyword" value="{{ $input['keyword'] }}">
                         <input type="hidden" name="role" value="{{ $input['role'] }}">
-                        <input type="hidden" name="start_date_created" value="{{ $input['start_date_created'] }}">
-                        <input type="hidden" name="end_date_created" value="{{ $input['end_date_created'] }}">
+                        <input type="hidden" class="unix-value-hidden" name="start_date_created" value="{{ $input['start_date_created'] }}">
+                        <input type="hidden" class="unix-value-hidden" name="end_date_created" value="{{ $input['end_date_created'] }}">
                         <input type="text" id="page" class="form-control text-center form-control-sm" name="page" value="{{ $input['page'] }}">
                     </form>
                 </li>
@@ -184,4 +249,5 @@
 
 @push('scripts')
     <script src="{{ url('assets/js/UnixToLocal.js') }}" defer></script>
+    <script src="{{ url('assets/js/admin/users/list.js') }}" defer></script>
 @endpush
