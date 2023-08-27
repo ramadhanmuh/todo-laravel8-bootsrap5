@@ -54,12 +54,23 @@ class TaskController extends Controller
 
             $data = $this->getListFromDatabase($data, $request);
         } else {
-            $cache = Cache::get('taskList' . $request->get('userAuth')->id . json_encode($data['input']));
+            $dataIsFound = 0;
+
+            $cache = Cache::get('taskList' . $request->get('userAuth')->id);
 
             if (empty($cache)) {
                 $data = $this->getListFromDatabase($data, $request);
             } else {
-                $data = $cache;
+                foreach ($cache as $key => $value) {
+                    if ($value['input'] === $data['input']) {
+                        $data = $cache[$key];
+                        $dataIsFound = 1;
+                    }   
+                }
+
+                if (!$dataIsFound) {
+                    $data = $this->getListFromDatabase($data, $request);
+                }
             }
         }
 
@@ -170,7 +181,16 @@ class TaskController extends Controller
                                         ->limit(12)
                                         ->get();
 
-        Cache::forever('taskList' . $request->get('userAuth')->id . json_encode($data['input']), $data);
+        $cache = Cache::get('taskList' . $request->get('userAuth')->id);
+
+        if (empty($cache)) {
+            $cache = [];
+            $cache[] = $data;
+            Cache::forever('taskList' . $request->get('userAuth')->id, $cache);
+        } else {
+            $cache[] = $data;
+            Cache::forever('taskList' . $request->get('userAuth')->id, $cache);
+        }
 
         return $data;
     }
@@ -249,6 +269,7 @@ class TaskController extends Controller
         if ($process) {
             $request->session()->flash('taskProcessSuccessfully', 'Berhasil menambah tugas.');
             Cache::forever('taskManaged' . $request->get('userAuth')->id, $currentTime);
+            Cache::forget('taskList' . $request->get('userAuth')->id);
         } else {
             $request->session()->flash('taskProcessFailed', 'Gagal menambah tugas.');
         }
@@ -413,6 +434,7 @@ class TaskController extends Controller
         if ($process) {
             $request->session()->flash('taskProcessSuccessfully', 'Berhasil mengubah tugas.');
             Cache::forever('taskManaged' . $request->get('userAuth')->id, $currentTime);
+            Cache::forget('taskList' . $request->get('userAuth')->id);
         } else {
             $request->session()->flash('taskProcessFailed', 'Gagal mengubah tugas.');
         }
@@ -441,6 +463,7 @@ class TaskController extends Controller
         if ($process) {
             $request->session()->flash('taskProcessSuccessfully', 'Berhasil menghapus tugas.');
             Cache::forever('taskManaged' . $request->get('userAuth')->id, time());
+            Cache::forget('taskList' . $request->get('userAuth')->id);
         } else {
             $request->session()->flash('taskProcessFailed', 'Gagal menghapus tugas.');
         }

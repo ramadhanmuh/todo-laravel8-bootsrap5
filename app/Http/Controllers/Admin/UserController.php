@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreUserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -51,12 +53,23 @@ class UserController extends Controller
 
             $data = $this->getListFromDatabase($data, $request);
         } else {
-            $cache = Cache::get('userList' . json_encode($data['input']));
+            $dataIsFound = 0;
+
+            $cache = Cache::get('userList');
 
             if (empty($cache)) {
                 $data = $this->getListFromDatabase($data, $request);
             } else {
-                $data = $cache;
+                foreach ($cache as $key => $value) {
+                    if ($value['input'] === $data['input']) {
+                        $data = $cache[$key];
+                        $dataIsFound = 1;
+                    }   
+                }
+
+                if (!$dataIsFound) {
+                    $data = $this->getListFromDatabase($data, $request);
+                }
             }
         }
 
@@ -85,7 +98,16 @@ class UserController extends Controller
                                 ->limit(15)
                                 ->get();
 
-        Cache::forever('userList' . json_encode($data['input']), $data);
+        $cache = Cache::get('userList');
+
+        if (empty($cache)) {
+            $cache = [];
+            $cache[] = $data;
+            Cache::forever('userList', $cache);
+        } else {
+            $cache[] = $data;
+            Cache::forever('userList', $cache);
+        }
 
         return $data;
     }
@@ -131,7 +153,13 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        $data['application'] = Cache::rememberForever('application', function () {
+            return DB::table('applications')->first();
+        });
+
+        $data['navbarActive'] = 'Users';
+
+        return view('pages.admin.user.create', $data);
     }
 
     /**
@@ -140,9 +168,29 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        //
+        $currentTime = time();
+
+        $input = $request->validated();
+        
+        $input['password'] = Hash::make($input['password']);
+
+        $input['email_verified_at'] = $currentTime;
+
+        $input['created_at'] = $currentTime;
+
+        $process = DB::table('users')->insert($input);
+
+        if ($process) {
+            $request->session()->flash('userProcessSuccessfully', 'Berhasil menambah pengguna.');
+            Cache::forever('userManaged', $currentTime);
+            Cache::forget('userList');
+        } else {
+            $request->session()->flash('userProcessFailed', 'Gagal menambah pengguna.');
+        }
+
+        return redirect()->route('admin.users.index');
     }
 
     /**

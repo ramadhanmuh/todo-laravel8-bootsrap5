@@ -135,7 +135,9 @@
                     <div class="col-12 d-md-none my-2">
                         <div class="card w-100">
                             <div class="card-body">
-                                <h5 class="card-title">{{ $item->name }}</h5>
+                                <h5 class="card-title">
+                                    <a href="{{ route('admin.users.show', $item->id) }}" class="text-decoration-none">{{ $item->name }}</a>
+                                </h5>
                                 <h6 class="card-subtitle mb-2 text-body-secondary">({{ $item->username }})</h6>
                                 <p class="card-text">{{ $item->email }}</p>
                                 <a href="{{ route('admin.users.edit', $item->id) }}" class="card-link text-decoration-none">Ubah</a>
@@ -148,7 +150,7 @@
                         </div>
                     </div>
                 @empty
-                    <span class="text-muted">Daftar pengguna tidak ditemukan.</span>
+                    <span class="text-muted d-md-none">Daftar pengguna tidak ditemukan.</span>
                 @endforelse
 
                 {{-- List Table --}}
@@ -168,11 +170,11 @@
                             <tbody>
                                 @forelse ($items as $item)
                                     <tr>
-                                        <td class="text-center align-middle">{{ $item->id }}</td>
+                                        <td class="text-center align-middle">
+                                            <a href="{{ route('admin.users.show', $item->id) }}" class="text-decoration-none">{{ $item->id }}</a>
+                                        </td>
                                         <td class="align-middle">
-                                            <a href="{{ route('admin.users.show', $item->id) }}" class="text-decoration-none">
-                                                {{ $item->name }}
-                                            </a>
+                                            {{ $item->name }}
                                         </td>
                                         <td class="text-center align-middle">{{ $item->username }}</td>
                                         <td class="text-center align-middle">{{ $item->email }}</td>
@@ -183,6 +185,11 @@
                                                     Aksi
                                                 </button>
                                                 <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a href="{{ route('admin.users.show', $item->id) }}" class="dropdown-item">
+                                                            Detail
+                                                        </a>
+                                                    </li>
                                                     <li>
                                                         <a href="{{ route('admin.users.edit', $item->id) }}" class="dropdown-item">
                                                             Ubah
@@ -203,7 +210,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-muted">Daftar pengguna tidak ditemukan.</td>
+                                        <td colspan="7" class="text-muted text-center">Daftar pengguna tidak ditemukan.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
