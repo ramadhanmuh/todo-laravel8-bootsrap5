@@ -21,6 +21,8 @@ use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\ChangePasswordController as AdminChangePasswordController;
 use App\Http\Controllers\Admin\ApplicationController as AdminApplicationController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
+use App\Http\Controllers\Owner\LoginController as OwnerLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +80,9 @@ Route::prefix('reset-password')->group(function () {
         });
 });
 
+Route::get('users/{id}/verification/{token}', [VerificationController::class, 'verify'])
+        ->name('verification');
+
 Route::prefix('user')->group(function () {
         Route::middleware('userisloggedin')->group(function () {
                 Route::name('user.')->group(function () {
@@ -132,7 +137,8 @@ Route::prefix('admin')->group(function () {
                                 Route::name('forgot-password.')->group(function () {
                                         Route::controller(AdminForgotPasswordController::class)->group(function () {
                                                 Route::get('/', 'show')->name('show');
-                                                Route::post('/', 'send')->name('send');
+                                                Route::post('/', 'send')->name('send')
+                                                                        ->middleware('throttle:3,5');
                                         });
                                 });
                         });
@@ -202,6 +208,46 @@ Route::prefix('admin')->group(function () {
         });
 });
 
-Route::get('users/{id}/verification/{token}', [VerificationController::class, 'verify'])
-        ->name('verification');
+Route::prefix('owner')->group(function () {
+        Route::name('owner.')->group(function () {
+                Route::middleware(['loggedoutowner'])->group(function () {
+                        Route::name('login.')->group(function () {
+                                Route::controller(OwnerLoginController::class)->group(function () {
+                                        Route::get('/', 'show')->name('show');
+                                        Route::post('/', 'authenticate')->name('authenticate')
+                                                                        ->middleware('throttle:5,5');
+                                });
+                        });
+                });
+
+                Route::middleware('ownerisloggedin')->group(function () {
+                        Route::prefix('dashboard')->group(function () {
+                                Route::name('dashboard.')->group(function () {
+                                        Route::controller(OwnerDashboardController::class)->group(function () {
+                                                Route::get('/', 'index')
+                                                        ->name('index');
+                                                Route::get('total-users', 'totalUsers')
+                                                        ->name('total-users');
+                                                Route::get('total-administrators', 'totalAdministrators')
+                                                        ->name('total-administrators');
+                                                Route::get('total-owners', 'totalOwners')
+                                                        ->name('total-owners');
+                                                Route::get('total-tasks-today', 'totalTasksToday')
+                                                        ->name('total-tasks-today');
+                                                Route::get('total-tasks-this-month', 'totalTasksThisMonth')
+                                                        ->name('total-tasks-this-month');
+                                                Route::get('total-tasks-this-year', 'totalTasksThisYear')
+                                                        ->name('total-tasks-this-year');
+                                                Route::get('total-daily-tasks', 'totalDailyTasks')
+                                                        ->name('total-daily-tasks');
+                                                Route::get('total-monthly-tasks', 'totalMonthlyTasks')
+                                                        ->name('total-monthly-tasks');
+                                                Route::get('total-annual-tasks', 'totalAnnualTasks')
+                                                        ->name('total-annual-tasks');
+                                        });
+                                });
+                        });
+                });
+        });
+});
 

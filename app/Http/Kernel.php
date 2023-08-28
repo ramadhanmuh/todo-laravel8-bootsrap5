@@ -67,6 +67,8 @@ class Kernel extends HttpKernel
         'userisloggedin' => \App\Http\Middleware\UserIsLoggedIn::class,
         'loggedoutuser' => \App\Http\Middleware\LoggedOutUser::class,
         'loggedoutadmin' => \App\Http\Middleware\LoggedOutAdmin::class,
-        'adminisloggedin' => \App\Http\Middleware\AdminIsLoggedIn::class
+        'adminisloggedin' => \App\Http\Middleware\AdminIsLoggedIn::class,
+        'loggedoutowner' => \App\Http\Middleware\LoggedOutOwner::class,
+        'ownerisloggedin' => \App\Http\Middleware\OwnerIsLoggedIn::class
     ];
 }

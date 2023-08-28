@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cookie;
 
-class UserIsLoggedIn
+class OwnerIsLoggedIn
 {
     /**
      * Handle an incoming request.
@@ -18,45 +18,45 @@ class UserIsLoggedIn
      */
     public function handle(Request $request, Closure $next)
     {
-        $session = session('userAuth', null);
+        $session = session('ownerAuth');
 
         if (empty($session)) {
-            $remember_token = $request->cookie('userAuth');
+            $remember_token = $request->cookie('ownerAuth');
 
             if (empty($remember_token)) {
                 return redirect()->route('login.show');
             }
 
-            $user = DB::table('users')->select('id', 'name', 'username')
-                                        ->where('role', '=', 'User')
+            $owner = DB::table('users')->select('id', 'name', 'username')
+                                        ->where('role', '=', 'Owner')
                                         ->where('remember_token', '=', $remember_token)
                                         ->first();
 
-            if (empty($user)) {
-                session()->forget('userAuth');
+            if (empty($owner)) {
+                session()->forget('ownerAuth');
 
-                Cookie::forget('userAuth');
-                
-                return redirect()->route('login.show');
+                Cookie::forget('ownerAuth');
+
+                return redirect()->route('owner.login.show');
             }
 
-            session(['userAuth' => $user]);
+            session(['ownerAuth' => $owner]);
         } else {
-            $user = DB::table('users')->select('id', 'name', 'username')
-                                        ->where('role', '=', 'User')
+            $owner = DB::table('users')->select('id', 'name', 'username')
+                                        ->where('role', '=', 'owner')
                                         ->where('id', '=', $session->id)
                                         ->first();
 
-            if (empty($user)) {
-                session()->forget('userAuth');
+            if (empty($owner)) {
+                session()->forget('ownerAuth');
 
-                Cookie::forget('userAuth');
+                Cookie::forget('ownerAuth');
 
-                return redirect()->route('login.show');
+                return redirect()->route('owner.login.show');
             }
         }
 
-        $request->attributes->add(['userAuth' => $user]);
+        $request->attributes->add(['ownerAuth' => $owner]);
 
         return $next($request);
     }

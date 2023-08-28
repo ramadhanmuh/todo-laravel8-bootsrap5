@@ -33,6 +33,10 @@ class AdminIsLoggedIn
                                         ->first();
 
             if (empty($user)) {
+                session()->forget('adminAuth');
+
+                Cookie::forget('adminAuth');
+                
                 return redirect()->route('login.show');
             }
 
