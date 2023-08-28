@@ -74,7 +74,7 @@ class TaskController extends Controller
             }
         }
 
-        Cache::forever('seeTaskList', $data['input']);
+        Cache::forever('seeTaskList' . $request->get('userAuth')->id, $data['input']);
 
         if (empty($data['items']) && $data['input']['page'] > 1) {
             $data['input']['page'] = 1;
@@ -439,7 +439,7 @@ class TaskController extends Controller
             $request->session()->flash('taskProcessFailed', 'Gagal mengubah tugas.');
         }
 
-        $seeList = Cache::get('seeTaskList');
+        $seeList = Cache::get('seeTaskList' . $request->get('userAuth')->id);
 
         if (empty($seeList)) {
             return redirect()->route('user.tasks.index');

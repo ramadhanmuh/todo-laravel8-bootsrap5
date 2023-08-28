@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cookie;
 
 class AdminIsLoggedIn
 {
@@ -38,10 +39,15 @@ class AdminIsLoggedIn
             session(['adminAuth' => $user]);
         } else {
             $user = DB::table('users')->select('id', 'name', 'username')
+                                        ->where('role', '=', 'Administrator')
                                         ->where('id', '=', $session->id)
                                         ->first();
 
             if (empty($user)) {
+                session()->forget('adminAuth');
+
+                Cookie::forget('adminAuth');
+
                 return redirect()->route('login.show');
             }
         }

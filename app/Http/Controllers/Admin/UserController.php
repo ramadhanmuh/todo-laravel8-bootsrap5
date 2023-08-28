@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -90,7 +91,9 @@ class UserController extends Controller
 
         $offset = $data['input']['page'] > 1 ? ($data['input']['page'] * 15) - 15 : 0;
 
-        $data['items'] = DB::table('users');
+        $data['items'] = DB::table('users')->select([
+            'id', 'name', 'username', 'email', 'created_at'
+        ]);
 
         $data['items'] = $this->listQuery($data['items'], $data['input'], $request)
                                 ->orderBy('name', 'asc')
@@ -113,11 +116,21 @@ class UserController extends Controller
     }
 
     private function listQuery($db, $input, $request) {
+        $role = ['Administrator', 'User'];
+
         $db = $db->where('id', '!=', $request->get('adminAuth')->id);
 
         if (!empty($input['role'])) {
-            $db = $db->where('role', '=', $input['role']);
+            if ($input['role'] === 'Administrator') {
+                unset($role['User']);
+            }
+
+            if ($input['role'] === 'User') {
+                unset($role['Administrator']);
+            }
         }
+
+        $db = $db->whereIn('role', $role);
 
         if (!empty($input['start_date_created']) && empty($input['end_date_created'])) {
             $db = $db->where('created_at', '>=', intval($input['start_date_created']));
@@ -199,9 +212,24 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
-        //
+        $data['application'] = Cache::rememberForever('application', function () {
+            return DB::table('applications')->first();
+        });
+
+        $data['navbarActive'] = 'Users';
+
+        $data['item'] = DB::table('users')
+                            ->where('role', '!=', 'Owner')
+                            ->where('id', '=', $id)
+                            ->first();
+
+        if (empty($data['item']) || $data['item']->id === $request->get('adminAuth')->id) {
+            abort(404);
+        }
+
+        return view('pages.admin.user.detail', $data);
     }
 
     /**
@@ -210,9 +238,36 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, Request $request)
     {
-        //
+        $data['application'] = Cache::rememberForever('application', function () {
+            return DB::table('applications')->first();
+        });
+
+        $data['navbarActive'] = 'Users';
+
+        $data['item'] = DB::table('users')
+                            ->select(['id', 'name', 'username', 'email', 'role'])
+                            ->where('role', '!=', 'Owner')
+                            ->where('id', '=', $id)
+                            ->first();
+
+        if (empty($data['item']) || $data['item']->id === $request->get('adminAuth')->id) {
+            abort(404);
+        }
+
+        $data['backURL'] = url()->previous();
+        $segments = explode('/', $data['backURL']);
+        $numSegments = count($segments); 
+        $currentSegment = $segments[$numSegments - 1];
+        $segment = explode('?', $currentSegment);
+        $segment = $segment[0];
+
+        if ($segment !== 'users') {
+            $data['backURL'] = route('admin.users.index');
+        }
+
+        return view('pages.admin.user.edit', $data);
     }
 
     /**
@@ -222,9 +277,44 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
-        //
+        $item = DB::table('users')
+                            ->select(['id', 'password'])
+                            ->where('role', '!=', 'Owner')
+                            ->where('id', '=', $id)
+                            ->first();
+
+        if (empty($item) || $item->id === $request->get('adminAuth')->id) {
+            abort(404);
+        }
+
+        $currentTime = time();
+
+        $input = [
+            'name' => $request->name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => $request->password,
+            'updated_at' => $currentTime
+        ];
+
+        if (empty($input['password'])) {
+            $input['password'] = $item->password;
+        }
+
+        $process = DB::table('users')->where('id', '=', $id)
+                                        ->update($input);
+
+        if ($process) {
+            $request->session()->flash('userProcessSuccessfully', 'Berhasil mengubah pengguna.');
+            Cache::forever('userManaged', $currentTime);
+            Cache::forget('userList');
+        } else {
+            $request->session()->flash('userProcessFailed', 'Gagal mengubah pengguna.');
+        }
+
+        return redirect()->route('admin.users.index');
     }
 
     /**

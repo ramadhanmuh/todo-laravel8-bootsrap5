@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cookie;
 
 class UserIsLoggedIn
 {
@@ -37,10 +38,15 @@ class UserIsLoggedIn
             session(['userAuth' => $user]);
         } else {
             $user = DB::table('users')->select('id', 'name', 'username')
+                                        ->where('role', '=', 'User')
                                         ->where('id', '=', $session->id)
                                         ->first();
 
             if (empty($user)) {
+                session()->forget('userAuth');
+
+                Cookie::forget('userAuth');
+
                 return redirect()->route('login.show');
             }
         }

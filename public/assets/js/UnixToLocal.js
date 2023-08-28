@@ -10,7 +10,17 @@ setTimeout(function() {
         // multiplied by 1000 so that the argument is in milliseconds, not seconds.
         var date = new Date(unix_timestamp * 1000);
         
-        var yearMonthDay = date.toLocaleDateString("id-ID").replace(/\//g, '-');
+        var dayMonthYear = date.toLocaleDateString("id-ID").split('/');
+
+        if (dayMonthYear[1].length < 2) {
+            dayMonthYear[1] = '0' + dayMonthYear[1];
+        }
+
+        if (dayMonthYear[0].length < 2) {
+            dayMonthYear[0] = '0' + dayMonthYear[0];
+        }
+
+        var yearMonthDay = dayMonthYear[2] + '-' + dayMonthYear[1] + '-' + dayMonthYear[0];
     
         var time = date.toLocaleTimeString("id-ID").replace(/\./g, ':');
     
