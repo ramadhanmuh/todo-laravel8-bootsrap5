@@ -16,51 +16,120 @@ function priceFormat(angka){
     return format;
 }
 
-// setTimeout(function() {
-//     var todayDate = new Date().toLocaleDateString('id-ID');
+function getData(url, date, callback) {
+    $.ajax({
+        url: url,
+        data: {
+            date: date
+        },
+        contentType: 'application/json',
+        success: function (data) {
+            callback(data);
+        },
+        error: function () {
+            callback(false);
+        }
+    });
+}
 
-//     todayDateSplited = todayDate.split('/', 3);
+function buildFirstRow(totalUsersURL, totalAdministratorsURL, totalOwnersURL, totalTasksURL, todayDate) {
+    getData(totalUsersURL, todayDate, function (result) {
+        if (result) {
+            $('#totalUsers').text(priceFormat(result.total));
+        } else {
+            $('#totalUsers').text('Gagal');
+            $('#totalUsers').addClass('text-danger');
+        }
 
-//     if (todayDateSplited[1].length < 2) {
-//         todayDateSplited[1] = '0' + todayDateSplited[1]
-//     }
+        getData(totalAdministratorsURL, todayDate, function (result) {
+            if (result) {
+                $('#totalAdministrators').text(priceFormat(result.total));
+            } else {
+                $('#totalAdministrators').text('Gagal');
+                $('#totalAdministrators').addClass('text-danger');
+            } 
+            
+            getData(totalOwnersURL, todayDate, function (result) {
+                if (result) {
+                    $('#totalOwners').text(priceFormat(result.total));
+                } else {
+                    $('#totalOwners').text('Gagal');
+                    $('#totalOwners').addClass('text-danger');
+                }
+        
+                getData(totalTasksURL, todayDate, function (result) {
+                    if (result) {
+                        $('#totalTasks').text(priceFormat(result.total));
+                    } else {
+                        $('#totalTasks').text('Gagal');
+                        $('#totalTasks').addClass('text-danger');
+                    }
+                });
+            });
+        });    
+    });
+}
 
-//     if (todayDateSplited[0].length < 2) {
-//         todayDateSplited[0] = '0' + todayDateSplited[1]
-//     }
+function buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate) {
+    getData(totalTasksTodayURL, todayDate, function (result) {
+        if (result) {
+            $('#totalTasksToday').text(priceFormat(result.total));
+        } else {
+            $('#totalTasksToday').text('Gagal');
+            $('#totalTasksToday').addClass('text-danger');
+        }
+
+        getData(totalTasksThisMonthURL, todayDate, function (result) {
+            console.log(result)
+            if (result) {
+                $('#totalTasksThisMonth').text(priceFormat(result.total));
+            } else {
+                $('#totalTasksThisMonth').text('Gagal');
+                $('#totalTasksThisMonth').addClass('text-danger');
+            } 
+            
+            getData(totalTasksThisYearURL, todayDate, function (result) {
+                if (result) {
+                    $('#totalTasksThisYear').text(priceFormat(result.total));
+                } else {
+                    $('#totalTasksThisYear').text('Gagal');
+                    $('#totalTasksThisYear').addClass('text-danger');
+                }
+            });
+        });    
+    });
+}
+
+setTimeout(function() {
+    var todayDate = new Date().toLocaleDateString('id-ID');
+
+    todayDateSplited = todayDate.split('/', 3);
+
+    if (todayDateSplited[1].length < 2) {
+        todayDateSplited[1] = '0' + todayDateSplited[1]
+    }
+
+    if (todayDateSplited[0].length < 2) {
+        todayDateSplited[0] = '0' + todayDateSplited[1]
+    }
     
-//     todayDate = todayDateSplited[2] + '-' + todayDateSplited[1] + '-' + todayDateSplited[0];
+    todayDate = todayDateSplited[2] + '-' + todayDateSplited[1] + '-' + todayDateSplited[0];
 
-//     var baseURL = $('meta[name="base-url"]').attr('content');
-    
-//     var totalTasksDailyURL = '';
-    
-//     var totalTasksMonthlyURL = '';
-    
-//     if (baseURL.substring(baseURL.length - 1) === '/') {
-//         totalTasksDailyURL += baseURL + 'admin/dashboard/total-tasks-daily';
-//         totalTasksMonthlyURL += baseURL + 'admin/dashboard/total-tasks-monthly';
-//     } else {
-//         totalTasksDailyURL += baseURL + '/admin/dashboard/total-tasks-daily';
-//         totalTasksMonthlyURL += baseURL + '/admin/dashboard/total-tasks-monthly';
-//     }
-    
-//     $.ajax({
-//         url: totalTasksDailyURL,
-//         data: JSON.stringify({date: todayDate}),
-//         contentType: 'application/json',
-//         success: function (data) {
-//             $('#dailyTotalTasks').text(priceFormat(data.total));
+    var baseURL = $('meta[name="base-url"]').attr('content');
 
-//             $.ajax({
-//                 url: totalTasksMonthlyURL,
-//                 data: JSON.stringify({date: todayDate}),
-//                 contentType: 'application/json',
-//                 success: function (data) {
-//                     $('#monthlyTotalTasks').text(priceFormat(data.total));
-//                 }
-//             });
-//         }
-//     });
+    if (baseURL.substring(baseURL.length - 1) !== '/') {
+        baseURL += '/';
+    }
 
-// }, 50);
+    var totalTasksTodayURL = baseURL + 'owner/dashboard/total-tasks-today';
+    var totalTasksThisMonthURL = baseURL + 'owner/dashboard/total-tasks-this-month';
+    var totalTasksThisYearURL = baseURL + 'owner/dashboard/total-tasks-this-year';
+    var totalUsersURL = baseURL + 'owner/dashboard/total-users';
+    var totalAdministratorsURL = baseURL + 'owner/dashboard/total-administrators';
+    var totalOwnersURL = baseURL + 'owner/dashboard/total-owners';
+    var totalTasksURL = baseURL + 'owner/dashboard/total-tasks';
+
+    buildFirstRow(totalUsersURL, totalAdministratorsURL, totalOwnersURL, totalTasksURL, todayDate);
+
+    buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate);
+}, 50);

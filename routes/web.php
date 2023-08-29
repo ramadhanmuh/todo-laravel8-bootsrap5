@@ -226,6 +226,8 @@ Route::prefix('owner')->group(function () {
                                         Route::controller(OwnerDashboardController::class)->group(function () {
                                                 Route::get('/', 'index')
                                                         ->name('index');
+                                                Route::get('total-tasks', 'totalUsers')
+                                                        ->name('total-tasks');
                                                 Route::get('total-users', 'totalUsers')
                                                         ->name('total-users');
                                                 Route::get('total-administrators', 'totalAdministrators')
