@@ -12,7 +12,6 @@ use DateTimeZone;
 class DashboardController extends Controller
 {
     public function index() {
-        // dd(date('w'));
         $data['application'] = Cache::rememberForever('application', function () {
             return DB::table('applications')->first();
         });
@@ -55,7 +54,13 @@ class DashboardController extends Controller
             ]); 
         }
 
-        $startDate = new DateTime($request->date . ' 00:00:00');
+        $timezone = $request->timezone;
+
+        if (empty($timezone)) {
+            $timezone = 'UTC';
+        }
+
+        $startDate = new DateTime($request->date . ' 00:00:00', new DateTimeZone($timezone));
 
         $startDate->setTimezone(new DateTimeZone('UTC'));
 
@@ -67,10 +72,15 @@ class DashboardController extends Controller
 
         $endDate = strtotime($endDate->format('Y-m-d H:i:s'));
 
+        $test = new DateTime($request->date . ' 00:00:00', new DateTimeZone($timezone));
+
+        $test->setTimezone(new DateTimeZone('UTC'));
+
         return response()->json([
             'total' => DB::table('tasks')->whereBetween('created_at', [
-                $startDate - 1, $endDate + 1
-            ])->count()
+                $startDate, $endDate
+            ])->count(),
+            'test' => $test
         ]);
     }
 
@@ -83,7 +93,13 @@ class DashboardController extends Controller
             ]); 
         }
 
-        $startDate = new DateTime($date[0] . '-' . $date[1] . '-01' . ' 00:00:00');
+        $timezone = $request->timezone;
+
+        if (empty($timezone)) {
+            $timezone = 'UTC';
+        }
+
+        $startDate = new DateTime($date[0] . '-' . $date[1] . '-01' . ' 00:00:00', new DateTimeZone($timezone));
 
         $startDate->setTimezone(new DateTimeZone('UTC'));
 
@@ -101,7 +117,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'total' => DB::table('tasks')->whereBetween('created_at', [
-                $startDate - 1, $endDate + 1
+                $startDate, $endDate
             ])->count()
         ]);
     }
@@ -115,7 +131,13 @@ class DashboardController extends Controller
             ]); 
         }
 
-        $startDate = new DateTime($date[0] . '-01-01 00:00:00');
+        $timezone = $request->timezone;
+
+        if (empty($timezone)) {
+            $timezone = 'UTC';
+        }
+
+        $startDate = new DateTime($date[0] . '-01-01 00:00:00', new DateTimeZone($timezone));
 
         $startDate->setTimezone(new DateTimeZone('UTC'));
 
@@ -129,20 +151,80 @@ class DashboardController extends Controller
 
         return response()->json([
             'total' => DB::table('tasks')->whereBetween('created_at', [
-                $startDate - 1, $endDate + 1
+                $startDate, $endDate
             ])->count()
         ]);
     }
 
-    public function totalDailyTask(Request $request) {
+    public function totalDailyTasks(Request $request) {
+        $response = [
+            [
+                'startTime' => '00:00:00',
+                'endTime' => '05:59:59',
+                'total' => 0
+            ],
+            [
+                'startTime' => '06:00:00',
+                'endTime' => '11:59:59',
+                'total' => 0
+            ],
+            [
+                'startTime' => '12:00:00',
+                'endTime' => '17:59:59',
+                'total' => 0
+            ],
+            [
+                'startTime' => '18:00:00',
+                'endTime' => '23:59:59',
+                'total' => 0
+            ],
+        ];
+
         $date = explode('-', $request->date);
 
         if (count($date) !== 3 || !checkdate($date[1], $date[2], $date[0])) {
-            return response()->json([
-                'total' => [0, 0, 0, 0, 0, 0, 0]
-            ]); 
+            return response()->json($response); 
         }
 
+        $selectRaw = 'id';
 
+        foreach ($response as $key => $value) {
+            // $startDate = new DateTime($request->date . ' ' . $value['startTime']);
+
+            // $startDate->setTimezone(new DateTimeZone('UTC'));
+
+            // $startDate = strtotime($startDate->format('Y-m-d H:i:s'));
+
+            // $endDate = new DateTime($request->date . ' ' . $value['endTime']);
+
+            // $endDate->setTimezone(new DateTimeZone('UTC'));
+
+            // $endDate = strtotime($endDate->format('Y-m-d H:i:s'));
+
+            $startDate = strtotime($request->date . ' ' . $value['startTime']);
+            $endDate = strtotime($request->date . ' ' . $value['endTime']);
+
+            $selectRaw .= ',(SELECT COUNT(*) FROM tasks WHERE created_at BETWEEN ' . $startDate . ' AND ' . $endDate . ') as "' . $value['startTime'] . '"';
+        }
+
+        $data = DB::table('tasks')->select(DB::raw($selectRaw))->limit(1)->get();
+
+        $startDate = new DateTime($request->date . ' 00:00:00');
+
+        dd($startDate);
+
+        $startDate->setTimezone(new DateTimeZone('UTC'));
+
+        // $startDate = strtotime($startDate->format('Y-m-d H:i:s'));
+        $startDate = $startDate->format('Y-m-d H:i:s');
+        dd($startDate);
+
+        // dd(strtotime($request->date . ' 00:00:00'), $startDate);
+
+        dd($data);
+
+        // foreach ($data as $key => $value) {
+        //     # code...
+        // }
     }
 }

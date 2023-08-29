@@ -1,3 +1,5 @@
+var timezone = '';
+
 function priceFormat(angka){
     var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
         split = number_string.split(','),
@@ -20,7 +22,8 @@ function getData(url, date, callback) {
     $.ajax({
         url: url,
         data: {
-            date: date
+            date: date,
+            timezone: timezone
         },
         contentType: 'application/json',
         success: function (data) {
@@ -72,6 +75,7 @@ function buildFirstRow(totalUsersURL, totalAdministratorsURL, totalOwnersURL, to
 
 function buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate) {
     getData(totalTasksTodayURL, todayDate, function (result) {
+        console.log(result)
         if (result) {
             $('#totalTasksToday').text(priceFormat(result.total));
         } else {
@@ -80,7 +84,6 @@ function buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksTh
         }
 
         getData(totalTasksThisMonthURL, todayDate, function (result) {
-            console.log(result)
             if (result) {
                 $('#totalTasksThisMonth').text(priceFormat(result.total));
             } else {
@@ -129,7 +132,11 @@ setTimeout(function() {
     var totalOwnersURL = baseURL + 'owner/dashboard/total-owners';
     var totalTasksURL = baseURL + 'owner/dashboard/total-tasks';
 
-    buildFirstRow(totalUsersURL, totalAdministratorsURL, totalOwnersURL, totalTasksURL, todayDate);
+    getData('http://ip-api.com/json/', '', function (result) {
+        timezone = result.timezone;
 
-    buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate);
+        buildFirstRow(totalUsersURL, totalAdministratorsURL, totalOwnersURL, totalTasksURL, todayDate);
+
+        buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate);
+    });
 }, 50);
