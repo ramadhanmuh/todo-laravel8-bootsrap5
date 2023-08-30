@@ -156,6 +156,73 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function totalTasksPerHour(Request $request) {
+        $response = [
+            [
+                'startTime' => '00:00:00',
+                'endTime' => '05:59:59',
+                'total' => 0
+            ],
+            [
+                'startTime' => '06:00:00',
+                'endTime' => '11:59:59',
+                'total' => 0
+            ],
+            [
+                'startTime' => '12:00:00',
+                'endTime' => '17:59:59',
+                'total' => 0
+            ],
+            [
+                'startTime' => '18:00:00',
+                'endTime' => '23:59:59',
+                'total' => 0
+            ],
+        ];
+
+        $date = explode('-', $request->date);
+
+        if (count($date) !== 3 || !checkdate($date[1], $date[2], $date[0])) {
+            return response()->json($response); 
+        }
+
+        try {
+            $timezone = new DateTimeZone($request->timezone);
+        } catch (\Throwable $th) {
+            $timezone = new DateTimeZone('UTC');
+        }
+
+        $selectRaw = 'id';
+
+        foreach ($response as $key => $value) {
+            $startDate = new DateTime($request->date . ' ' . $value['startTime'], $timezone);
+
+            $startDate = $startDate->getTimestamp();
+
+            $endDate = new DateTime($request->date . ' ' . $value['endTime'], $timezone);
+
+            $endDate = $endDate->getTimestamp();
+
+            $selectRaw .= ',(SELECT COUNT(*) FROM tasks WHERE created_at BETWEEN ' . $startDate . ' AND ' . $endDate . ') as "' . $value['startTime'] . '"';
+        }
+
+        $data = DB::table('tasks')->select(DB::raw($selectRaw))->limit(1)->get();
+
+        if (empty($data)) {
+            return response()->json($response);
+        }
+
+        foreach ($response as $key => $value) {
+            foreach ($data[0] as $key2 => $value2) {
+                if ($value['startTime'] === $key2) {
+                    $response[$key]['total'] = $value2;
+                }
+            }
+        }
+
+        return response()->json($response);
+    }
+
     public function totalDailyTasks(Request $request) {
         $response = [
             [
@@ -186,45 +253,40 @@ class DashboardController extends Controller
             return response()->json($response); 
         }
 
+        try {
+            $timezone = new DateTimeZone($request->timezone);
+        } catch (\Throwable $th) {
+            $timezone = new DateTimeZone('UTC');
+        }
+
         $selectRaw = 'id';
 
         foreach ($response as $key => $value) {
-            // $startDate = new DateTime($request->date . ' ' . $value['startTime']);
+            $startDate = new DateTime($request->date . ' ' . $value['startTime'], $timezone);
 
-            // $startDate->setTimezone(new DateTimeZone('UTC'));
+            $startDate = $startDate->getTimestamp();
 
-            // $startDate = strtotime($startDate->format('Y-m-d H:i:s'));
+            $endDate = new DateTime($request->date . ' ' . $value['endTime'], $timezone);
 
-            // $endDate = new DateTime($request->date . ' ' . $value['endTime']);
-
-            // $endDate->setTimezone(new DateTimeZone('UTC'));
-
-            // $endDate = strtotime($endDate->format('Y-m-d H:i:s'));
-
-            $startDate = strtotime($request->date . ' ' . $value['startTime']);
-            $endDate = strtotime($request->date . ' ' . $value['endTime']);
+            $endDate = $endDate->getTimestamp();
 
             $selectRaw .= ',(SELECT COUNT(*) FROM tasks WHERE created_at BETWEEN ' . $startDate . ' AND ' . $endDate . ') as "' . $value['startTime'] . '"';
         }
 
         $data = DB::table('tasks')->select(DB::raw($selectRaw))->limit(1)->get();
 
-        $startDate = new DateTime($request->date . ' 00:00:00');
+        if (empty($data)) {
+            return response()->json($response);
+        }
 
-        dd($startDate);
+        foreach ($response as $key => $value) {
+            foreach ($data[0] as $key2 => $value2) {
+                if ($value['startTime'] === $key2) {
+                    $response[$key]['total'] = $value2;
+                }
+            }
+        }
 
-        $startDate->setTimezone(new DateTimeZone('UTC'));
-
-        // $startDate = strtotime($startDate->format('Y-m-d H:i:s'));
-        $startDate = $startDate->format('Y-m-d H:i:s');
-        dd($startDate);
-
-        // dd(strtotime($request->date . ' 00:00:00'), $startDate);
-
-        dd($data);
-
-        // foreach ($data as $key => $value) {
-        //     # code...
-        // }
+        return response()->json($response);
     }
 }

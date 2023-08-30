@@ -75,7 +75,6 @@ function buildFirstRow(totalUsersURL, totalAdministratorsURL, totalOwnersURL, to
 
 function buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate) {
     getData(totalTasksTodayURL, todayDate, function (result) {
-        console.log(result)
         if (result) {
             $('#totalTasksToday').text(priceFormat(result.total));
         } else {
@@ -103,6 +102,74 @@ function buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksTh
     });
 }
 
+function createTasksPerHourChart(url, date) {
+    // getData(url, date, function (result) {
+    getData(url, '2023-08-25', function (result) {
+        if ($(window).width() < 768) {
+            $('#totalTasksPerHour').css('height', '100px');
+        } else {
+            $('#totalTasksPerHour').attr('height', '100');
+        }
+
+        if (result) {
+            var labels = [],
+                data = [];
+
+            result.forEach(function(value, index, array) {
+                if ($(window).width() < 768) {
+                    labels.push(value.startTime);
+                } else {
+                    labels.push(value.startTime + '-' + value.endTime);
+                }
+
+                data.push(value.total);
+            });
+
+            new Chart(document.getElementById('totalTasksPerHour'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of tasks',
+                        data: data,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            new Chart(document.getElementById('totalTasksPerHour'), {
+                type: 'bar',
+                data: {
+                    labels: ['Gagal', 'Gagal', 'Gagal', 'Gagal', 'Gagal', 'Gagal'],
+                    datasets: [{
+                        // label: '# of Votes',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    });
+}
+
+function buildTaskChart(totalTasksPerHourURL, todayDate) {
+    createTasksPerHourChart(totalTasksPerHourURL, todayDate);
+}
+
 setTimeout(function() {
     var todayDate = new Date().toLocaleDateString('id-ID');
 
@@ -118,6 +185,8 @@ setTimeout(function() {
     
     todayDate = todayDateSplited[2] + '-' + todayDateSplited[1] + '-' + todayDateSplited[0];
 
+    $('.date-input').val(todayDate);
+
     var baseURL = $('meta[name="base-url"]').attr('content');
 
     if (baseURL.substring(baseURL.length - 1) !== '/') {
@@ -131,6 +200,7 @@ setTimeout(function() {
     var totalAdministratorsURL = baseURL + 'owner/dashboard/total-administrators';
     var totalOwnersURL = baseURL + 'owner/dashboard/total-owners';
     var totalTasksURL = baseURL + 'owner/dashboard/total-tasks';
+    var totalTasksPerHourURL = baseURL + 'owner/dashboard/total-tasks-per-hour';
 
     getData('http://ip-api.com/json/', '', function (result) {
         timezone = result.timezone;
@@ -138,5 +208,7 @@ setTimeout(function() {
         buildFirstRow(totalUsersURL, totalAdministratorsURL, totalOwnersURL, totalTasksURL, todayDate);
 
         buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate);
+
+        buildTaskChart(totalTasksPerHourURL, todayDate);
     });
 }, 50);

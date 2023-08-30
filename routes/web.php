@@ -240,6 +240,8 @@ Route::prefix('owner')->group(function () {
                                                         ->name('total-tasks-this-month');
                                                 Route::get('total-tasks-this-year', 'totalTasksThisYear')
                                                         ->name('total-tasks-this-year');
+                                                Route::get('total-tasks-per-hour', 'totalTasksPerHour')
+                                                        ->name('total-tasks-per-hour');
                                                 Route::get('total-daily-tasks', 'totalDailyTasks')
                                                         ->name('total-daily-tasks');
                                                 Route::get('total-monthly-tasks', 'totalMonthlyTasks')
