@@ -56,8 +56,7 @@
                 <hr>
             </div>
             <div class="col-12 my-2">
-                <h5 class="text-center mb-0 mb-md-3">Total Tugas Dibuat Hari Ini <span class="d-none d-md-inline">(Per 6 Jam)</span></h5>
-                <h5 class="d-md-none mb-3 text-center">(Per 6 Jam)</h5>
+                <h5 class="text-center mb-3">Total Tugas Dibuat Hari Ini</h5>
                 <form class="row align-items-center mb-2" action="" id="totalTasksPerHourForm">
                     <div class="col-7 col-md-auto">
                         <input type="date" class="form-control date-input" id="totalTasksPerHourDate">

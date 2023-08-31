@@ -1,4 +1,11 @@
+if ($(window).width() < 768) {
+    $('#totalTasksPerHour').css('height', '100px');
+} else {
+    $('#totalTasksPerHour').attr('height', '100');
+}
+
 var timezone = '';
+var totalTasksPerHour = false;
 
 function priceFormat(angka){
     var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
@@ -102,19 +109,37 @@ function buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksTh
     });
 }
 
-function createTasksPerHourChart(url, date) {
-    // getData(url, date, function (result) {
-    getData(url, '2023-08-25', function (result) {
-        if ($(window).width() < 768) {
-            $('#totalTasksPerHour').css('height', '100px');
-        } else {
-            $('#totalTasksPerHour').attr('height', '100');
+function createTasksPerHourChart(labels, data) {
+    if (totalTasksPerHour) {
+        totalTasksPerHour.destroy();
+    }
+
+    totalTasksPerHour = new Chart(document.getElementById('totalTasksPerHour'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Number of tasks',
+                data: data,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
+    });
+}
+
+function buildTaskChart(totalTasksPerHourURL, todayDate) {
+    getData(totalTasksPerHourURL, todayDate, function (result) {
+        var labels = [],
+            data = [];
 
         if (result) {
-            var labels = [],
-                data = [];
-
             result.forEach(function(value, index, array) {
                 if ($(window).width() < 768) {
                     labels.push(value.startTime);
@@ -124,51 +149,18 @@ function createTasksPerHourChart(url, date) {
 
                 data.push(value.total);
             });
-
-            new Chart(document.getElementById('totalTasksPerHour'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Number of tasks',
-                        data: data,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
         } else {
-            new Chart(document.getElementById('totalTasksPerHour'), {
-                type: 'bar',
-                data: {
-                    labels: ['Gagal', 'Gagal', 'Gagal', 'Gagal', 'Gagal', 'Gagal'],
-                    datasets: [{
-                        // label: '# of Votes',
-                        data: [0, 0, 0, 0, 0, 0],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+            for (var index = 0; index < 4; index++) {
+                labels[index] = 'Gagal';
+                data[index] = 0;                
+            }
         }
+
+        createTasksPerHourChart(labels, data);
     });
 }
 
-function buildTaskChart(totalTasksPerHourURL, todayDate) {
-    createTasksPerHourChart(totalTasksPerHourURL, todayDate);
-}
+createTasksPerHourChart(['', '', '', ''], [0, 0, 0, 0]);
 
 setTimeout(function() {
     var todayDate = new Date().toLocaleDateString('id-ID');

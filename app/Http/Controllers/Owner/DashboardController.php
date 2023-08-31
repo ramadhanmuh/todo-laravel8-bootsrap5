@@ -224,28 +224,7 @@ class DashboardController extends Controller
     }
 
     public function totalDailyTasks(Request $request) {
-        $response = [
-            [
-                'startTime' => '00:00:00',
-                'endTime' => '05:59:59',
-                'total' => 0
-            ],
-            [
-                'startTime' => '06:00:00',
-                'endTime' => '11:59:59',
-                'total' => 0
-            ],
-            [
-                'startTime' => '12:00:00',
-                'endTime' => '17:59:59',
-                'total' => 0
-            ],
-            [
-                'startTime' => '18:00:00',
-                'endTime' => '23:59:59',
-                'total' => 0
-            ],
-        ];
+        $response = [0, 0, 0, 0, 0, 0, 0];
 
         $date = explode('-', $request->date);
 
@@ -259,18 +238,70 @@ class DashboardController extends Controller
             $timezone = new DateTimeZone('UTC');
         }
 
+        $dateTimeDate = new DateTime($request->date . ' 00:00:00', $timezone);
+
+        $numberOfDay = $dateTimeDate->format('N');
+
+        $unixDate = $dateTimeDate->getTimestamp();
+
+        $unixList = [];
+
+        if ($numberOfDay === 1) {
+            $unixList[] = [
+                'startTime' => $unixDate,
+                'endTime' => $unixDate + 86399
+            ];
+
+            for ($i=1; $i < 7; $i++) { 
+                $startTime = $unixList[0] + ($i * 86400);
+
+                $unixList[] = [
+                    'startTime' => $startTime,
+                    'endTime' => $startTime + 86399
+                ];
+            }
+        } else {
+            $unixList[$numberOfDay - 1] = [
+                'startTime' => $unixDate,
+                'endTime' => $unixDate + 86399
+            ];
+
+            $totalBeforeDay = 0;
+            $totalNextDay = 0;
+
+            for ($i=$numberOfDay; $i > 1; $i--) { 
+                $totalBeforeDay++;
+            }
+
+            for ($i=$numberOfDay; $i < 7; $i++) { 
+                $totalNextDay++;
+            }
+
+            for ($i=0; $i < $totalBeforeDay; $i++) { 
+                $startTime = $unixDate - (($totalBeforeDay - $i) * 86400);
+
+                $unixList[$i] = [
+                    'startTime' => $startTime,
+                    'endTime' => $startTime + 86399
+                ];
+            }
+
+            for ($i=0; $i < $totalNextDay; $i++) { 
+                $startTime = $unixDate + (($i + 1) * 86400);
+
+                $unixList[$i + $numberOfDay] = [
+                    'startTime' => $startTime,
+                    'endTime' => $startTime + 86399
+                ];
+            }
+        }
+
+        ksort($unixList, SORT_NUMERIC);
+
         $selectRaw = 'id';
 
-        foreach ($response as $key => $value) {
-            $startDate = new DateTime($request->date . ' ' . $value['startTime'], $timezone);
-
-            $startDate = $startDate->getTimestamp();
-
-            $endDate = new DateTime($request->date . ' ' . $value['endTime'], $timezone);
-
-            $endDate = $endDate->getTimestamp();
-
-            $selectRaw .= ',(SELECT COUNT(*) FROM tasks WHERE created_at BETWEEN ' . $startDate . ' AND ' . $endDate . ') as "' . $value['startTime'] . '"';
+        foreach ($unixList as $key => $value) {
+            $selectRaw .= ',(SELECT COUNT(*) FROM tasks WHERE created_at BETWEEN ' . $value['startTime'] . ' AND ' . $value['endTime'] . ') as "' . $key . '"';
         }
 
         $data = DB::table('tasks')->select(DB::raw($selectRaw))->limit(1)->get();
@@ -279,12 +310,12 @@ class DashboardController extends Controller
             return response()->json($response);
         }
 
-        foreach ($response as $key => $value) {
-            foreach ($data[0] as $key2 => $value2) {
-                if ($value['startTime'] === $key2) {
-                    $response[$key]['total'] = $value2;
-                }
+        foreach ($data[0] as $key => $value) {
+            if ($key === 'id') {
+                continue;
             }
+
+            $response[$key] = $value;
         }
 
         return response()->json($response);
