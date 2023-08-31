@@ -1,11 +1,12 @@
 if ($(window).width() < 768) {
-    $('#totalTasksPerHour').css('height', '100px');
+    $('canvas').css('height', '100px');
 } else {
-    $('#totalTasksPerHour').attr('height', '100');
+    $('canvas').attr('height', '100');
 }
 
-var timezone = '';
-var totalTasksPerHour = false;
+var timezone = '',
+    totalTasksPerHour = false,
+    totalTasksDaily = false;
 
 function priceFormat(angka){
     var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
@@ -134,8 +135,34 @@ function createTasksPerHourChart(labels, data) {
     });
 }
 
-function buildTaskChart(totalTasksPerHourURL, todayDate) {
-    getData(totalTasksPerHourURL, todayDate, function (result) {
+function createTasksDailyChart(labels, data) {
+    if (totalTasksDaily) {
+        totalTasksDaily.destroy();
+    }
+
+    totalTasksDaily = new Chart(document.getElementById('totalTasksDaily'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Number of tasks',
+                data: data,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            locale: 'id-ID',
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function getDataTasksPerHour(totalTasksPerHourURL, date, callback) {
+    getData(totalTasksPerHourURL, date, function (result) {
         var labels = [],
             data = [];
 
@@ -156,11 +183,50 @@ function buildTaskChart(totalTasksPerHourURL, todayDate) {
             }
         }
 
+        callback(labels, data);
+    });
+}
+
+function getDataTasksDaily(url, date, callback) {
+    getData(url, date, function (result) {
+        var data = [],
+            labels = [];
+
+        if (result) {
+            labels.push('Senin');
+            labels.push('Selasa');
+            labels.push('Rabu');
+            labels.push('Kamis');
+            labels.push('Jumat');
+            labels.push('Sabtu');
+            labels.push('Minggu');
+
+            result.forEach(function(value, index, array) {
+                data.push(value);
+            });
+        } else {
+            for (var index = 0; index < 7; index++) {
+                labels.push('Gagal');
+                data.push(0);               
+            }
+        }
+
+        callback(labels, data);
+    });
+}
+
+function buildTaskChart(totalTasksPerHourURL, totalTasksDailyURL, date) {
+    getDataTasksPerHour(totalTasksPerHourURL, date, function (labels, data) {
         createTasksPerHourChart(labels, data);
+
+        getDataTasksDaily(totalTasksDailyURL, date, function (labels, data) {
+            createTasksDailyChart(labels, data);
+        });
     });
 }
 
 createTasksPerHourChart(['', '', '', ''], [0, 0, 0, 0]);
+createTasksDailyChart(['', '', '', '', '', '', ''], [0, 0, 0, 0, 0, 0, 0]);
 
 setTimeout(function() {
     var todayDate = new Date().toLocaleDateString('id-ID');
@@ -193,6 +259,7 @@ setTimeout(function() {
     var totalOwnersURL = baseURL + 'owner/dashboard/total-owners';
     var totalTasksURL = baseURL + 'owner/dashboard/total-tasks';
     var totalTasksPerHourURL = baseURL + 'owner/dashboard/total-tasks-per-hour';
+    var totalTasksDailyURL = baseURL + 'owner/dashboard/total-daily-tasks';
 
     getData('http://ip-api.com/json/', '', function (result) {
         timezone = result.timezone;
@@ -201,6 +268,22 @@ setTimeout(function() {
 
         buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate);
 
-        buildTaskChart(totalTasksPerHourURL, todayDate);
+        buildTaskChart(totalTasksPerHourURL, totalTasksDailyURL, todayDate);
     });
-}, 50);
+
+    $('#totalTasksPerHourForm').submit(function (event) {
+        event.preventDefault();
+
+        getDataTasksPerHour(totalTasksPerHourURL, $('#totalTasksPerHourDate').val(), function (labels, data) {
+            createTasksPerHourChart(labels, data);
+        });
+    });
+
+    $('#totalTasksDailyForm').submit(function (event) {
+        event.preventDefault();
+
+        getDataTasksDaily(totalTasksDailyURL, $('#totalTasksDailyDate').val(), function (labels, data) {
+            createTasksDailyChart(labels, data);
+        });
+    });
+}, 100);
