@@ -449,4 +449,96 @@ class DashboardController extends Controller
             DB::table('tasks')->select(DB::raw($selectRaw))->limit(1)->first()
         );
     }
+
+    public function userGrowth(Request $request) {
+        $defaultYear = date('Y');
+
+        $response = [
+            [
+                'year' => intval($defaultYear) - 4,
+                'total' => 0
+            ],
+            [
+                'year' => intval($defaultYear) - 3,
+                'total' => 0
+            ],
+            [
+                'year' => intval($defaultYear) - 2,
+                'total' => 0
+            ],
+            [
+                'year' => intval($defaultYear) - 1,
+                'total' => 0
+            ],
+            [
+                'year' => intval($defaultYear),
+                'total' => 0
+            ]
+        ];
+
+        $input = [
+            'date' => $request->date,
+            'timezone' => $request->timezone
+        ];
+
+        $dateArray = explode('-', $input['date']);
+
+        if (count($dateArray) !== 3) {
+            return response()->json($response);
+        }
+
+        $year = intval($dateArray[0]);
+        $month = intval($dateArray[1]);
+        $day = intval($dateArray[2]);
+
+        if (!checkdate($month, $day, $year)) {
+            return response()->json($response);
+        }
+
+        try {
+            $timezone = new DateTimeZone($input['timezone']);
+        } catch (\Throwable $th) {
+            $timezone = new DateTimeZone('UTC');
+        }
+
+        $previousYearLimit = $year - 4;
+
+        $endTimes = [];
+
+        $endTimesIndex = 0;
+
+        for ($i=$previousYearLimit; $i <= $year; $i++) {
+            $endTimes[$endTimesIndex] = [
+                'year' => $i,
+                'unix' => new DateTime($i . '-12-31 23:59:59', $timezone)
+            ];
+
+            $endTimes[$endTimesIndex]['unix'] = $endTimes[$endTimesIndex]['unix']->getTimestamp();
+            $endTimesIndex++;
+        }
+
+        $selectRaw = '';
+
+        foreach ($endTimes as $key => $value) {
+            if ($key === 4) {
+                $selectRaw .= '(SELECT COUNT(*) FROM users WHERE email_verified_at IS NOT NULL AND role="User" AND created_at BETWEEN 0 AND ' . $value['unix'] . ') as "year_' . $value['year'] . '"';
+            } else {
+                $selectRaw .= '(SELECT COUNT(*) FROM users WHERE email_verified_at IS NOT NULL AND role="User" AND created_at BETWEEN 0 AND ' . $value['unix'] . ') as "year_' . $value['year'] . '",';
+            }
+        }
+
+        $data = DB::table('users')->select(DB::raw($selectRaw))
+                                    ->first();
+
+        $response = [];
+
+        foreach ($data as $key => $value) {
+            $response[] = [
+                'year' => explode('_', $key)[1],
+                'total' => $value
+            ];
+        }
+
+        return response()->json($response);
+    }
 }

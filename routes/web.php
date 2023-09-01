@@ -246,8 +246,8 @@ Route::prefix('owner')->group(function () {
                                                         ->name('total-daily-tasks');
                                                 Route::get('total-monthly-tasks', 'totalMonthlyTasks')
                                                         ->name('total-monthly-tasks');
-                                                Route::get('total-annual-tasks', 'totalAnnualTasks')
-                                                        ->name('total-annual-tasks');
+                                                Route::get('user-growth', 'userGrowth')
+                                                        ->name('user-growth');
                                         });
                                 });
                         });

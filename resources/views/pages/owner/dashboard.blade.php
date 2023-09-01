@@ -92,6 +92,19 @@
                 </form>
                 <canvas id="totalTasksMonthly">Your browser does not support the canvas element.</canvas>
             </div>
+
+            <div class="col-12 mt-4">
+                <h5 class="text-center mb-3">Pertumbuhan Total Pengguna</h5>
+                <form class="row align-items-center mb-2" action="" id="userGrowthForm">
+                    <div class="col-7 col-md-auto">
+                        <input type="date" class="form-control date-input" id="userGrowthDate">
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-sm btn-primary" type="submit">Terapkan</button>
+                    </div>
+                </form>
+                <canvas id="userGrowth">Your browser does not support the canvas element.</canvas>
+            </div>
         </div>
     </div>
 @endsection

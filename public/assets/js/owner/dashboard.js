@@ -7,7 +7,8 @@ if ($(window).width() < 768) {
 var timezone = '',
     totalTasksPerHour = false,
     totalTasksDaily = false,
-    totalTasksMonthly = false;
+    totalTasksMonthly = false,
+    userGrowth = false;
 
 function priceFormat(angka){
     var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
@@ -188,6 +189,32 @@ function createTasksMonthlyChart(labels, data) {
     });
 }
 
+function createUserGrowthChart(labels, data) {
+    if (userGrowth) {
+        userGrowth.destroy();
+    }
+
+    userGrowth = new Chart(document.getElementById('userGrowth'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    data: data
+                }
+            ]
+        },
+        options: {
+            locale: 'id-ID',
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
 function getDataTasksPerHour(totalTasksPerHourURL, date, callback) {
     getData(totalTasksPerHourURL, date, function (result) {
         var labels = [],
@@ -266,6 +293,27 @@ function getDataTasksMonthly(url, date, callback) {
     });
 }
 
+function getDataUserGrowth(url, date, callback) {
+    getData(url, date, function (result) {
+        var data = [],
+            labels = [];
+
+        if (result) {
+            result.forEach(function (value, index, array) {
+                labels.push(value.year);
+                data.push(value.total);
+            });
+        } else {
+            for (var index = 1; index < 13; index++) {
+                labels.push('Gagal');
+                data.push(0);               
+            }
+        }
+
+        callback(labels, data);
+    });
+}
+
 function buildTaskChart(totalTasksPerHourURL, totalTasksDailyURL, totalTasksMonthlyURL, date) {
     getDataTasksPerHour(totalTasksPerHourURL, date, function (labels, data) {
         createTasksPerHourChart(labels, data);
@@ -285,9 +333,16 @@ function buildTaskChart(totalTasksPerHourURL, totalTasksDailyURL, totalTasksMont
     });
 }
 
+function buildUserGrowthChart(url, date) {
+    getDataUserGrowth(url, date, function (labels, data) {
+        createUserGrowthChart(labels, data);
+    });
+}
+
 createTasksPerHourChart(['', '', '', ''], [0, 0, 0, 0]);
 createTasksDailyChart(['', '', '', '', '', '', ''], [0, 0, 0, 0, 0, 0, 0]);
 createTasksMonthlyChart(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+createUserGrowthChart(['', '', '', '', ''], [0, 0, 0, 0, 0]);
 
 var testLabel = [];
 
@@ -331,6 +386,7 @@ setTimeout(function() {
     var totalTasksPerHourURL = baseURL + 'owner/dashboard/total-tasks-per-hour';
     var totalTasksDailyURL = baseURL + 'owner/dashboard/total-daily-tasks';
     var totalTasksMonthlyURL = baseURL + 'owner/dashboard/total-monthly-tasks';
+    var userGrowthURL = baseURL + 'owner/dashboard/user-growth';
 
     getData('http://ip-api.com/json/', '', function (result) {
         timezone = result.timezone;
@@ -340,6 +396,8 @@ setTimeout(function() {
         buildSecondRow(totalTasksTodayURL, totalTasksThisMonthURL, totalTasksThisYearURL, todayDate);
 
         buildTaskChart(totalTasksPerHourURL, totalTasksDailyURL, totalTasksMonthlyURL, todayDate);
+
+        buildUserGrowthChart(userGrowthURL, todayDate);
     });
 
     $('#totalTasksPerHourForm').submit(function (event) {
