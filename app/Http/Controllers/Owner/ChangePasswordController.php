@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ChangePasswordRequest;
+use App\Http\Requests\Owner\ChangePasswordRequest;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -11,18 +11,17 @@ use Illuminate\Support\Facades\Hash;
 class ChangePasswordController extends Controller
 {
     public function edit() {
-        // dd(Hash::make('admin'));
         $data['application'] = Cache::rememberForever('application', function () {
             return DB::table('applications')->first();
         });
 
         $data['navbarActive'] = 'change-password';
 
-        return view('pages.admin.change-password.edit', $data);
+        return view('pages.owner.change-password.edit', $data);
     }
 
     public function update(ChangePasswordRequest $request) {
-        $process = DB::table('users')->where('id', '=', session('adminAuth')->id)
+        $process = DB::table('users')->where('id', '=', session('ownerAuth')->id)
                                         ->update([
                                             'password' => Hash::make($request->password),
                                             'updated_at' => time()
@@ -36,6 +35,6 @@ class ChangePasswordController extends Controller
 
         $request->session()->flash('passwordChangedSuccessfully', 'OK');
 
-        return redirect()->route('admin.change-password.edit');
+        return redirect()->route('owner.change-password.edit');
     }
 }

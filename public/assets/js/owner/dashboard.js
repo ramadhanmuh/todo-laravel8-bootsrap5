@@ -11,7 +11,7 @@ var timezone = '',
     userGrowth = false;
 
 function priceFormat(angka){
-    var number_string = angka.toString().replace(/[^,\d]/g, '').toString(),
+    var number_string = angka.toString().replace(/[^,\d]/g, ''),
         split = number_string.split(','),
         sisa = split[0].length % 3,
         format = split[0].substr(0, sisa),
@@ -275,13 +275,10 @@ function getDataTasksMonthly(url, date, callback) {
         var data = [],
             labels = [];
 
-        for (var month = 1; month < 13; month++) {
-            labels.push(month.toString());
-        }
-
         if (result) {
-            for (var month = 1; month < 12; month++) {
-                data.push(result['month_' + month.toString()]);
+            for (var month = 1; month < 13; month++) {
+                labels.push(month.toString());
+                data.push(result['month_' + month]);
             }
         } else {
             for (var index = 1; index < 13; index++) {
@@ -317,7 +314,7 @@ function getDataUserGrowth(url, date, callback) {
 
 function buildTaskChart(totalTasksPerHourURL, totalTasksDailyURL, totalTasksMonthlyURL, date) {
     getDataTasksPerHour(totalTasksPerHourURL, date, function (labels, data) {
-        // createTasksPerHourChart(labels, data);
+        createTasksPerHourChart(labels, data);
 
         setTimeout(function() {
             getDataTasksDaily(totalTasksDailyURL, date, function (labels, data) {
@@ -340,10 +337,10 @@ function buildUserGrowthChart(url, date) {
     });
 }
 
-createTasksPerHourChart(['', '', '', ''], [10000, 0, 0, 0]);
-createTasksDailyChart(['', '', '', '', '', '', ''], [0, 0, 0, 0, 0, 0, 0]);
-createTasksMonthlyChart(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-createUserGrowthChart(['', '', '', '', ''], [0, 0, 0, 0, 0]);
+createTasksPerHourChart(['Memuat', 'Memuat', 'Memuat', 'Memuat'], [0, 0, 0, 0]);
+createTasksDailyChart(['Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat'], [0, 0, 0, 0, 0, 0, 0]);
+createTasksMonthlyChart(['Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat'], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+createUserGrowthChart(['Memuat', 'Memuat', 'Memuat', 'Memuat', 'Memuat'], [0, 0, 0, 0, 0]);
 
 var testLabel = [];
 

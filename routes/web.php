@@ -24,6 +24,10 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\LoginController as OwnerLoginController;
 use App\Http\Controllers\Owner\LogoutController as OwnerLogoutController;
+use App\Http\Controllers\Owner\ProfileController;
+use App\Http\Controllers\Owner\ForgotPasswordController as OwnerForgotPasswordController;
+use App\Http\Controllers\Owner\ResetPasswordController as OwnerResetPasswordController;
+use App\Http\Controllers\Owner\ChangePasswordController as OwnerChangePasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -219,6 +223,27 @@ Route::prefix('owner')->group(function () {
                                                                         ->middleware('throttle:5,5');
                                 });
                         });
+
+                        Route::prefix('forgot-password')->group(function () {
+                                Route::name('forgot-password.')->group(function () {
+                                        Route::controller(OwnerForgotPasswordController::class)->group(function () {
+                                                Route::get('/', 'show')->name('show');
+                                                Route::post('/', 'send')->name('send')
+                                                                        ->middleware('throttle:3,5');
+                                        });
+                                });
+                        });
+
+                        Route::prefix('reset-password')->group(function () {
+                                Route::name('reset-password.')->group(function () {
+                                        Route::get('/', [OwnerResetPasswordController::class, 'show'])
+                                                ->name('show');
+                        
+                                        Route::post('/', [OwnerResetPasswordController::class, 'save'])
+                                                ->name('save')
+                                                ->middleware(['throttle:3,5']);
+                                });
+                        });
                 });
 
                 Route::middleware('ownerisloggedin')->group(function () {
@@ -251,6 +276,30 @@ Route::prefix('owner')->group(function () {
                                                         ->name('total-monthly-tasks');
                                                 Route::get('user-growth', 'userGrowth')
                                                         ->name('user-growth');
+                                        });
+                                });
+                        });
+
+                        Route::prefix('profile')->group(function () {
+                                Route::name('profile.')->group(function () {
+                                        Route::controller(ProfileController::class)->group(function () {
+                                                Route::get('/', 'index')
+                                                        ->name('index');
+                                                Route::get('edit', 'edit')
+                                                        ->name('edit');
+                                                Route::put('/', 'update')
+                                                        ->name('update');
+                                        });
+                                });
+                        });
+
+                        Route::prefix('change-password')->group(function () {
+                                Route::controller(OwnerChangePasswordController::class)->group(function () {
+                                        Route::name('change-password.')->group(function () {
+                                                Route::get('/', 'edit')
+                                                        ->name('edit');
+                                                Route::put('edit', 'update')
+                                                        ->name('update');
                                         });
                                 });
                         });

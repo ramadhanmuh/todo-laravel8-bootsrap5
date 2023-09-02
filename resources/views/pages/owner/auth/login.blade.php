@@ -42,7 +42,7 @@
                         </button>
                     </div>
                     <div class="col-auto">
-                        <a href="{{ route('admin.forgot-password.show') }}" class="text-decoration-none">
+                        <a href="{{ route('owner.forgot-password.show') }}" class="text-decoration-none">
                             Lupa Kata Sandi ?
                         </a>
                     </div>

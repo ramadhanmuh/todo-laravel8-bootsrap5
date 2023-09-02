@@ -23,8 +23,8 @@
                     {{ request()->get('ownerAuth')->username }}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end">
-                    <li><a class="dropdown-item {{ $navbarActive === 'profile' ? 'active' : '' }}" href="{{ route('admin.profile.index') }}">Profil</a></li>
-                    <li><a class="dropdown-item {{ $navbarActive === 'change-password' ? 'active' : '' }}" href="{{ route('admin.change-password.edit') }}">Ubah Kata Sandi</a></li>
+                    <li><a class="dropdown-item {{ $navbarActive === 'profile' ? 'active' : '' }}" href="{{ route('owner.profile.index') }}">Profil</a></li>
+                    <li><a class="dropdown-item {{ $navbarActive === 'change-password' ? 'active' : '' }}" href="{{ route('owner.change-password.edit') }}">Ubah Kata Sandi</a></li>
                     <li>
                         <form class="dropdown-item" action="{{ route('owner.logout') }}" method="POST">
                             @csrf

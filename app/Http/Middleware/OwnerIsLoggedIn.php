@@ -24,7 +24,7 @@ class OwnerIsLoggedIn
             $remember_token = $request->cookie('ownerAuth');
 
             if (empty($remember_token)) {
-                return redirect()->route('login.show');
+                return redirect()->route('owner.login.show');
             }
 
             $owner = DB::table('users')->select('id', 'name', 'username')
