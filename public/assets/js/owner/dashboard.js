@@ -1,5 +1,5 @@
 if ($(window).width() < 768) {
-    $('canvas').css('height', '100px');
+    $('canvas').css('height', '150px');
 } else {
     $('canvas').attr('height', '100');
 }
@@ -200,6 +200,7 @@ function createUserGrowthChart(labels, data) {
             labels: labels,
             datasets: [
                 {
+                    label: 'Total Pengguna',
                     data: data
                 }
             ]
@@ -223,7 +224,7 @@ function getDataTasksPerHour(totalTasksPerHourURL, date, callback) {
         if (result) {
             result.forEach(function(value, index, array) {
                 if ($(window).width() < 768) {
-                    labels.push(value.startTime);
+                    labels.push(value.startTime.substring(0, 5) + ' - ' + value.endTime.substring(0, 5));
                 } else {
                     labels.push(value.startTime + '-' + value.endTime);
                 }
@@ -316,7 +317,7 @@ function getDataUserGrowth(url, date, callback) {
 
 function buildTaskChart(totalTasksPerHourURL, totalTasksDailyURL, totalTasksMonthlyURL, date) {
     getDataTasksPerHour(totalTasksPerHourURL, date, function (labels, data) {
-        createTasksPerHourChart(labels, data);
+        // createTasksPerHourChart(labels, data);
 
         setTimeout(function() {
             getDataTasksDaily(totalTasksDailyURL, date, function (labels, data) {
@@ -339,7 +340,7 @@ function buildUserGrowthChart(url, date) {
     });
 }
 
-createTasksPerHourChart(['', '', '', ''], [0, 0, 0, 0]);
+createTasksPerHourChart(['', '', '', ''], [10000, 0, 0, 0]);
 createTasksDailyChart(['', '', '', '', '', '', ''], [0, 0, 0, 0, 0, 0, 0]);
 createTasksMonthlyChart(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 createUserGrowthChart(['', '', '', '', ''], [0, 0, 0, 0, 0]);
@@ -403,16 +404,68 @@ setTimeout(function() {
     $('#totalTasksPerHourForm').submit(function (event) {
         event.preventDefault();
 
+        var submitButton = $(this).find('button');
+
+        submitButton.attr('disabled', true);
+        submitButton.text('Memuat');
+
         getDataTasksPerHour(totalTasksPerHourURL, $('#totalTasksPerHourDate').val(), function (labels, data) {
             createTasksPerHourChart(labels, data);
+
+            submitButton.attr('disabled', false);
+            submitButton.text('Terapkan');
         });
     });
 
     $('#totalTasksDailyForm').submit(function (event) {
         event.preventDefault();
 
+        var submitButton = $(this).find('button');
+
+        submitButton.attr('disabled', true);
+        submitButton.text('Memuat');
+
         getDataTasksDaily(totalTasksDailyURL, $('#totalTasksDailyDate').val(), function (labels, data) {
             createTasksDailyChart(labels, data);
+
+            submitButton.attr('disabled', false);
+            submitButton.text('Terapkan');
+        });
+    });
+
+    $('#totalTasksMonthlyForm').submit(function (event) {
+        event.preventDefault();
+
+        var submitButton = $(this).find('button');
+
+        submitButton.attr('disabled', true);
+        submitButton.text('Memuat');
+
+        getDataTasksMonthly(totalTasksMonthlyURL, $('#totalTasksMonthlyDate').val(), function (labels, data) {
+            createTasksMonthlyChart(labels, data);
+
+            submitButton.attr('disabled', false);
+            submitButton.text('Terapkan');
+        });
+    });
+
+    $('#userGrowthForm').submit(function (event) {
+        event.preventDefault();
+
+        var submitButton = $(this).find('button');
+
+        submitButton.attr('disabled', true);
+        submitButton.text('Memuat');
+
+        getDataTasksMonthly(userGrowthURL, $('#userGrowthDate').val(), function (labels, data) {
+            createTasksMonthlyChart(labels, data);
+
+            submitButton.attr('disabled', false);
+            submitButton.text('Terapkan');
+
+            $('html, body').animate({
+                scrollTop: $('#userGrowthForm').offset().top
+            }, 500);
         });
     });
 }, 100);

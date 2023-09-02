@@ -22,8 +22,7 @@ class LogoutController extends Controller
 
         $request->session()->forget('adminAuth');
 
-        Cookie::forget('adminAuth');
-
-        return redirect()->route('admin.login.show');
+        return redirect()->route('admin.login.show')
+                            ->withCookie(Cookie::forget('adminAuth'));
     }
 }

@@ -94,7 +94,7 @@
             </div>
 
             <div class="col-12 mt-4">
-                <h5 class="text-center mb-3">Pertumbuhan Total Pengguna</h5>
+                <h5 class="text-center mb-3">Pertumbuhan Total Pendaftar</h5>
                 <form class="row align-items-center mb-2" action="" id="userGrowthForm">
                     <div class="col-7 col-md-auto">
                         <input type="date" class="form-control date-input" id="userGrowthDate">

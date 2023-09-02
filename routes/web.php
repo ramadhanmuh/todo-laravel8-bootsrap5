@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\ApplicationController as AdminApplicationControll
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Owner\DashboardController as OwnerDashboardController;
 use App\Http\Controllers\Owner\LoginController as OwnerLoginController;
+use App\Http\Controllers\Owner\LogoutController as OwnerLogoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -221,6 +222,8 @@ Route::prefix('owner')->group(function () {
                 });
 
                 Route::middleware('ownerisloggedin')->group(function () {
+                        Route::post('logout', OwnerLogoutController::class)->name('logout');
+
                         Route::prefix('dashboard')->group(function () {
                                 Route::name('dashboard.')->group(function () {
                                         Route::controller(OwnerDashboardController::class)->group(function () {

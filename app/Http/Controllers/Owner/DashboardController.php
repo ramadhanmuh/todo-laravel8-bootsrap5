@@ -534,7 +534,7 @@ class DashboardController extends Controller
 
         foreach ($data as $key => $value) {
             $response[] = [
-                'year' => explode('_', $key)[1],
+                'year' => intval(explode('_', $key)[1]),
                 'total' => $value
             ];
         }
