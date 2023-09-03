@@ -12,10 +12,10 @@
                     <a class="nav-link {{ $navbarActive === 'dashboard' ? 'active' : '' }}" href="{{ route('owner.dashboard.index') }}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ $navbarActive === 'users' ? 'active' : '' }}" href="{{ route('admin.users.index') }}">Pengguna</a>
+                    <a class="nav-link {{ $navbarActive === 'users' ? 'active' : '' }}" href="{{ route('owner.users.index') }}">Pengguna</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ $navbarActive === 'application' ? 'active' : '' }}" href="{{ route('admin.application.index') }}">Aplikasi</a>
+                    <a class="nav-link {{ $navbarActive === 'application' ? 'active' : '' }}" href="{{ route('owner.application.index') }}">Aplikasi</a>
                 </li>
             </ul>
             <div class="mt-2 mt-lg-0">

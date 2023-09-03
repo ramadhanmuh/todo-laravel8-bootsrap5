@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreUserRequest;
-use App\Http\Requests\Admin\UpdateUserRequest;
+use App\Http\Requests\Owner\StoreUserRequest;
+use App\Http\Requests\Owner\UpdateUserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller
 {
@@ -42,22 +41,22 @@ class UserController extends Controller
             $data['input']['page'] = 500;
         }
 
-        $listChanges = Cache::get('userListChanges');
+        $listChanges = Cache::get('ownerUserListChanges');
 
         $listManaged = Cache::get('userManaged');
 
         if ((empty($listChanges) && empty($listManaged)) || (!empty($listManaged) && $listChanges !== $listManaged)) {
             if (empty($listManaged)) {
-                Cache::forever('userListChanges', 1);
+                Cache::forever('ownerUserListChanges', 1);
             } else {
-                Cache::forever('userListChanges', $listManaged);
+                Cache::forever('ownerUserListChanges', $listManaged);
             }
 
             $data = $this->getListFromDatabase($data, $request);
         } else {
             $dataIsFound = 0;
 
-            $cache = Cache::get('userList');
+            $cache = Cache::get('ownerUserList');
 
             if (empty($cache)) {
                 $data = $this->getListFromDatabase($data, $request);
@@ -75,7 +74,7 @@ class UserController extends Controller
             }
         }
 
-        return view('pages.admin.user.index', $data);
+        return view('pages.owner.user.index', $data);
     }
 
     private function getListFromDatabase($data, $request) {
@@ -102,36 +101,26 @@ class UserController extends Controller
                                 ->limit(15)
                                 ->get();
 
-        $cache = Cache::get('userList');
+        $cache = Cache::get('ownerUserList');
 
         if (empty($cache)) {
             $cache = [];
             $cache[] = $data;
-            Cache::forever('userList', $cache);
+            Cache::forever('ownerUserList', $cache);
         } else {
             $cache[] = $data;
-            Cache::forever('userList', $cache);
+            Cache::forever('ownerUserList', $cache);
         }
 
         return $data;
     }
 
     private function listQuery($db, $input, $request) {
-        $role = ['Administrator', 'User'];
-
-        $db = $db->where('id', '!=', $request->get('adminAuth')->id);
+        $db = $db->where('id', '!=', $request->get('ownerAuth')->id);
 
         if (!empty($input['role'])) {
-            if ($input['role'] === 'Administrator') {
-                unset($role['User']);
-            }
-
-            if ($input['role'] === 'User') {
-                unset($role['Administrator']);
-            }
+            $db = $db->where('role', '=', $input['role']);
         }
-
-        $db = $db->whereIn('role', $role);
 
         if (!empty($input['start_date_created']) && empty($input['end_date_created'])) {
             $db = $db->where('created_at', '>=', intval($input['start_date_created']));
@@ -173,7 +162,7 @@ class UserController extends Controller
 
         $data['navbarActive'] = 'Users';
 
-        return view('pages.admin.user.create', $data);
+        return view('pages.owner.user.create', $data);
     }
 
     /**
@@ -199,13 +188,13 @@ class UserController extends Controller
         if ($process) {
             $request->session()->flash('userProcessSuccessfully', 'Berhasil menambah pengguna.');
             Cache::forever('userManaged', $currentTime);
-            Cache::forget('userList');
             Cache::forget('ownerUserList');
+            Cache::forget('userList');
         } else {
             $request->session()->flash('userProcessFailed', 'Gagal menambah pengguna.');
         }
 
-        return redirect()->route('admin.users.index');
+        return redirect()->route('owner.users.index');
     }
 
     /**
@@ -223,15 +212,14 @@ class UserController extends Controller
         $data['navbarActive'] = 'Users';
 
         $data['item'] = DB::table('users')
-                            ->where('role', '!=', 'Owner')
                             ->where('id', '=', $id)
                             ->first();
 
-        if (empty($data['item']) || $data['item']->id === $request->get('adminAuth')->id) {
+        if (empty($data['item']) || $data['item']->id === $request->get('ownerAuth')->id) {
             abort(404);
         }
 
-        return view('pages.admin.user.detail', $data);
+        return view('pages.owner.user.detail', $data);
     }
 
     /**
@@ -250,11 +238,10 @@ class UserController extends Controller
 
         $data['item'] = DB::table('users')
                             ->select(['id', 'name', 'username', 'email', 'role'])
-                            ->where('role', '!=', 'Owner')
                             ->where('id', '=', $id)
                             ->first();
 
-        if (empty($data['item']) || $data['item']->id === $request->get('adminAuth')->id) {
+        if (empty($data['item']) || $data['item']->id === $request->get('ownerAuth')->id) {
             abort(404);
         }
 
@@ -266,10 +253,10 @@ class UserController extends Controller
         $segment = $segment[0];
 
         if ($segment !== 'users') {
-            $data['backURL'] = route('admin.users.index');
+            $data['backURL'] = route('owner.users.index');
         }
 
-        return view('pages.admin.user.edit', $data);
+        return view('pages.owner.user.edit', $data);
     }
 
     /**
@@ -283,11 +270,10 @@ class UserController extends Controller
     {
         $item = DB::table('users')
                             ->select(['id', 'password'])
-                            ->where('role', '!=', 'Owner')
                             ->where('id', '=', $id)
                             ->first();
 
-        if (empty($item) || $item->id === $request->get('adminAuth')->id) {
+        if (empty($item) || $item->id === $request->get('ownerAuth')->id) {
             abort(404);
         }
 
@@ -311,13 +297,13 @@ class UserController extends Controller
         if ($process) {
             $request->session()->flash('userProcessSuccessfully', 'Berhasil mengubah pengguna.');
             Cache::forever('userManaged', $currentTime);
-            Cache::forget('userList');
             Cache::forget('ownerUserList');
+            Cache::forget('userList');
         } else {
             $request->session()->flash('userProcessFailed', 'Gagal mengubah pengguna.');
         }
 
-        return redirect()->route('admin.users.index');
+        return redirect()->route('owner.users.index');
     }
 
     /**
@@ -329,10 +315,9 @@ class UserController extends Controller
     public function destroy($id, Request $request)
     {
         $item = DB::table('users')
-                    ->select(['id'])
-                    ->where('role', '!=', 'Owner')
-                    ->where('id', '=', $id)
-                    ->first();
+                            ->select(['id'])
+                            ->where('id', '=', $id)
+                            ->first();
 
         if (empty($item) || $item->id === $request->get('ownerAuth')->id) {
             abort(404);
@@ -350,6 +335,6 @@ class UserController extends Controller
             $request->session()->flash('userProcessFailed', 'Gagal mengubah pengguna.');
         }
 
-        return redirect()->route('admin.users.index');
+        return redirect()->route('owner.users.index');
     }
 }

@@ -48,5 +48,22 @@ class UserSeeder extends Seeder
                 'created_at' => time()
             ],
         ]);
+
+        $input = [];
+
+        for ($i=0; $i < 1000; $i++) { 
+            $input[] = [
+                'id' => Str::uuid(),
+                'name' => Str::random(10),
+                'username' => Str::random(10),
+                'email' => Str::random(10) . '@gmail.com',
+                'email_verified_at' => time(),
+                'password' => Hash::make('owner'),
+                'role' => 'User',
+                'created_at' => time()
+            ];
+        }
+
+        DB::table('users')->insert($input);
     }
 }

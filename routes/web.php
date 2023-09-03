@@ -28,6 +28,8 @@ use App\Http\Controllers\Owner\ProfileController;
 use App\Http\Controllers\Owner\ForgotPasswordController as OwnerForgotPasswordController;
 use App\Http\Controllers\Owner\ResetPasswordController as OwnerResetPasswordController;
 use App\Http\Controllers\Owner\ChangePasswordController as OwnerChangePasswordController;
+use App\Http\Controllers\Owner\ApplicationController as OwnerApplicationController;
+use App\Http\Controllers\Owner\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -303,6 +305,21 @@ Route::prefix('owner')->group(function () {
                                         });
                                 });
                         });
+
+                        Route::prefix('application')->group(function () {
+                                Route::controller(OwnerApplicationController::class)->group(function () {
+                                        Route::name('application.')->group(function () {
+                                                Route::get('/', 'index')
+                                                        ->name('index');
+                                                Route::get('edit', 'edit')
+                                                        ->name('edit');
+                                                Route::put('edit', 'update')
+                                                        ->name('update');
+                                        });
+                                });
+                        });
+
+                        Route::resource('users', UserController::class);
                 });
         });
 });

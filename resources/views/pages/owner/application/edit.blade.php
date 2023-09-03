@@ -1,6 +1,6 @@
-@extends('layouts.admin')
+@extends('layouts.owner')
 
-@section('title', 'Administrator - Aplikasi - Ubah')
+@section('title', 'Owner - Aplikasi - Ubah')
 
 @section('description', 'Halaman yang menampilkan formulir pengubahan informasi aplikasi.')
 
@@ -18,7 +18,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            <form action="{{ route('admin.application.update') }}" method="post" class="row">
+            <form action="{{ route('owner.application.update') }}" method="post" class="row">
                 @csrf
                 @method('PUT')
                 <div class="col-md-6 mb-3">
@@ -41,7 +41,7 @@
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ route('admin.application.index') }}" class="btn btn-light border border-dark">
+                    <a href="{{ route('owner.application.index') }}" class="btn btn-light border border-dark">
                         Kembali
                     </a>
                 </div>

@@ -1,6 +1,6 @@
-@extends('layouts.admin')
+@extends('layouts.owner')
 
-@section('title', 'Administrator - Pengguna')
+@section('title', 'Owner - Pengguna')
 
 @section('description', 'Halaman yang menampilkan daftar pengguna yang terdaftar.')
 
@@ -8,7 +8,7 @@
     {{-- Filter Modal --}}
     <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form class="modal-content" action="{{ route('admin.users.index') }}" method="GET">
+            <form class="modal-content" action="{{ route('owner.users.index') }}" method="GET">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="filterModalLabel">Saring Pengguna</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -20,6 +20,9 @@
                             <option value="">-- Pilih --</option>
                             <option value="Administrator" {{ $input['role'] === 'Administrator' ? 'selected' : '' }}>
                                 Administrator
+                            </option>
+                            <option value="Owner" {{ $input['role'] === 'Owner' ? 'selected' : '' }}>
+                                Owner
                             </option>
                             <option value="User" {{ $input['role'] === 'User' ? 'selected' : '' }}>
                                 User
@@ -72,7 +75,7 @@
             @endif
             <div class="row justify-content-end mb-3">
                 <div class="col-auto">
-                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+                    <a href="{{ route('owner.users.create') }}" class="btn btn-primary">
                         Buat Pengguna
                     </a>
                 </div>
@@ -83,17 +86,17 @@
                 <div class="col-auto">
                     <ul class="pagination pagination-sm m-0">
                         <li class="page-item">
-                            <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
+                            <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
                                 <<
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
+                            <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
                                 <
                             </a>
                         </li>
                         <li class="page-item" style="max-width: 50px">
-                            <form action="{{ route('admin.users.index') }}" method="get">
+                            <form action="{{ route('owner.users.index') }}" method="get">
                                 <input type="hidden" name="keyword" value="{{ $input['keyword'] }}">
                                 <input type="hidden" name="role" value="{{ $input['role'] }}">
                                 <input type="hidden" class="unix-value-hidden" name="start_date_created" value="{{ $input['start_date_created'] }}">
@@ -102,12 +105,12 @@
                             </form>
                         </li>
                         <li class="page-item">
-                            <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
+                            <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
                                 >
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
+                            <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
                                 >>
                             </a>
                         </li>
@@ -133,12 +136,12 @@
                         <div class="card w-100">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <a href="{{ route('admin.users.show', $item->id) }}" class="text-decoration-none">{{ $item->name }}</a>
+                                    <a href="{{ route('owner.users.show', $item->id) }}" class="text-decoration-none">{{ $item->name }}</a>
                                 </h5>
                                 <h6 class="card-subtitle mb-2 text-body-secondary">({{ $item->username }})</h6>
                                 <p class="card-text">{{ $item->email }}</p>
-                                <a href="{{ route('admin.users.edit', $item->id) }}" class="card-link text-decoration-none">Ubah</a>
-                                <form action="{{ route('admin.users.destroy', $item->id) }}" class="card-link d-inline" method="POST">
+                                <a href="{{ route('owner.users.edit', $item->id) }}" class="card-link text-decoration-none">Ubah</a>
+                                <form action="{{ route('owner.users.destroy', $item->id) }}" class="card-link d-inline" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <button class="btn text-danger p-0" type="submit" onclick="return confirm('Pengguna {{ $item->name }} ingin dihapus ?')">Hapus</button>
@@ -168,7 +171,7 @@
                                 @forelse ($items as $item)
                                     <tr>
                                         <td class="text-center align-middle">
-                                            <a href="{{ route('admin.users.show', $item->id) }}" class="text-decoration-none">{{ $item->id }}</a>
+                                            <a href="{{ route('owner.users.show', $item->id) }}" class="text-decoration-none">{{ $item->id }}</a>
                                         </td>
                                         <td class="align-middle">
                                             {{ $item->name }}
@@ -183,17 +186,17 @@
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li>
-                                                        <a href="{{ route('admin.users.show', $item->id) }}" class="dropdown-item">
+                                                        <a href="{{ route('owner.users.show', $item->id) }}" class="dropdown-item">
                                                             Detail
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ route('admin.users.edit', $item->id) }}" class="dropdown-item">
+                                                        <a href="{{ route('owner.users.edit', $item->id) }}" class="dropdown-item">
                                                             Ubah
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <form action="{{ route('admin.users.destroy', $item->id) }}" class="dropdown-item" method="POST">
+                                                        <form action="{{ route('owner.users.destroy', $item->id) }}" class="dropdown-item" method="POST">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="w-100 btn text-start p-0" onclick="return confirm('Pengguna {{ $item->name }} ingin dihapus ?')">
@@ -218,17 +221,17 @@
             {{-- Pagination --}}
             <ul class="pagination pagination-sm m-0">
                 <li class="page-item">
-                    <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
+                    <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
                         <<
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
+                    <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
                         <
                     </a>
                 </li>
                 <li class="page-item" style="max-width: 50px">
-                    <form action="{{ route('admin.users.index') }}" method="get">
+                    <form action="{{ route('owner.users.index') }}" method="get">
                         <input type="hidden" name="keyword" value="{{ $input['keyword'] }}">
                         <input type="hidden" name="role" value="{{ $input['role'] }}">
                         <input type="hidden" class="unix-value-hidden" name="start_date_created" value="{{ $input['start_date_created'] }}">
@@ -237,12 +240,12 @@
                     </form>
                 </li>
                 <li class="page-item">
-                    <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
+                    <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
                         >
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('admin.users.index', $input) }}">
+                    <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
                         >>
                     </a>
                 </li>
