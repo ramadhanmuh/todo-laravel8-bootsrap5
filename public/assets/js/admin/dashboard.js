@@ -44,23 +44,36 @@ setTimeout(function() {
         totalTasksDailyURL += baseURL + '/admin/dashboard/total-tasks-daily';
         totalTasksMonthlyURL += baseURL + '/admin/dashboard/total-tasks-monthly';
     }
-    
+
     $.ajax({
-        url: totalTasksDailyURL,
-        data: JSON.stringify({date: todayDate}),
+        url: 'http://ip-api.com/json/',
         contentType: 'application/json',
         success: function (data) {
-            $('#dailyTotalTasks').text(priceFormat(data.total));
+            var timezone = data.timezone;
+
+            var input = {
+                date: todayDate,
+                timezone: timezone
+            };
 
             $.ajax({
-                url: totalTasksMonthlyURL,
-                data: JSON.stringify({date: todayDate}),
+                url: totalTasksDailyURL,
+                data: input,
                 contentType: 'application/json',
                 success: function (data) {
-                    $('#monthlyTotalTasks').text(priceFormat(data.total));
+                    $('#dailyTotalTasks').text(priceFormat(data.total));
+        
+                    $.ajax({
+                        url: totalTasksMonthlyURL,
+                        data: input,
+                        contentType: 'application/json',
+                        success: function (data) {
+                            $('#monthlyTotalTasks').text(priceFormat(data.total));
+                        }
+                    });
                 }
             });
         }
-    });
+    })
 
 }, 50);

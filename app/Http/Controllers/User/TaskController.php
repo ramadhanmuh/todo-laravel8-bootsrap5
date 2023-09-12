@@ -230,22 +230,27 @@ class TaskController extends Controller
             }
         }
 
-        $start_time = intval($start_time);
-        $end_time = intval($end_time);
+        if (!empty($start_time)) {
+            $start_time = intval($start_time);
 
-        if ($start_time < 0) {
-            return back()->withErrors([
-                'start_time' => 'The start time should be more than that.'
-            ])->withInput($request->all());
+            if ($start_time < 0) {
+                return back()->withErrors([
+                    'start_time' => 'The start time should be more than that.'
+                ])->withInput($request->all());
+            }
         }
 
-        if ($end_time < 0) {
-            return back()->withErrors([
-                'end_time' => 'The end time should be more than that.'
-            ])->withInput($request->all());
+        if (!empty($end_time)) {
+            $end_time = intval($end_time);
+
+            if ($end_time < 0) {
+                return back()->withErrors([
+                    'end_time' => 'The end time should be more than that.'
+                ])->withInput($request->all());
+            }
         }
 
-        if ($start_time > $end_time) {
+        if (intval($start_time) > intval($end_time)) {
             return back()->withErrors([
                 'end_time' => 'The end time must be greather than the start time.'
             ])->withInput($request->all());
@@ -397,22 +402,27 @@ class TaskController extends Controller
             }
         }
 
-        $start_time = intval($start_time);
-        $end_time = intval($end_time);
+        if (!empty($start_time)) {
+            $start_time = intval($start_time);
 
-        if ($start_time < 0) {
-            return back()->withErrors([
-                'start_time' => 'The start time should be more than that.'
-            ])->withInput($request->all());
+            if ($start_time < 0) {
+                return back()->withErrors([
+                    'start_time' => 'The start time should be more than that.'
+                ])->withInput($request->all());
+            }
         }
 
-        if ($end_time < 0) {
-            return back()->withErrors([
-                'end_time' => 'The end time should be more than that.'
-            ])->withInput($request->all());
+        if (!empty($end_time)) {
+            $end_time = intval($end_time);
+
+            if ($end_time < 0) {
+                return back()->withErrors([
+                    'end_time' => 'The end time should be more than that.'
+                ])->withInput($request->all());
+            }
         }
 
-        if ($start_time > $end_time) {
+        if (intval($start_time) > intval($end_time)) {
             return back()->withErrors([
                 'end_time' => 'The end time must be greather than the start time.'
             ])->withInput($request->all());

@@ -86,12 +86,12 @@
                 <div class="col-auto">
                     <ul class="pagination pagination-sm m-0">
                         <li class="page-item">
-                            <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
+                            <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ $firstPageURL }}">
                                 <<
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
+                            <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ $previousPageURL }}">
                                 <
                             </a>
                         </li>
@@ -105,12 +105,12 @@
                             </form>
                         </li>
                         <li class="page-item">
-                            <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
+                            <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ $nextPageURL }}">
                                 >
                             </a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
+                            <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ $lastPageURL }}">
                                 >>
                             </a>
                         </li>
@@ -221,12 +221,12 @@
             {{-- Pagination --}}
             <ul class="pagination pagination-sm m-0">
                 <li class="page-item">
-                    <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
+                    <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ $firstPageURL }}">
                         <<
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
+                    <a class="page-link {{ $input['page'] === 1 ? 'disabled' : '' }}" href="{{ $previousPageURL }}">
                         <
                     </a>
                 </li>
@@ -240,12 +240,12 @@
                     </form>
                 </li>
                 <li class="page-item">
-                    <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
+                    <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ $nextPageURL }}">
                         >
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ route('owner.users.index', $input) }}">
+                    <a class="page-link {{ $input['page'] === $totalPages || $input['page'] >= $totalPages ? 'disabled' : '' }}" href="{{ $lastPageURL }}">
                         >>
                     </a>
                 </li>

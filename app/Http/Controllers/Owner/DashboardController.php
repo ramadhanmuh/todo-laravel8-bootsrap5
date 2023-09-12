@@ -223,12 +223,16 @@ class DashboardController extends Controller
 
         $date = explode('-', $request->date);
 
+        if (count($date) !== 3) {
+            return response()->json($response);
+        }
+
         $year = intval($date[0]);
         $month = intval($date[1]);
         $day = intval($date[2]);
 
-        if (count($date) !== 3 || !checkdate($month, $day, $year)) {
-            return response()->json($response); 
+        if (!checkdate($month, $day, $year)) {
+            return response()->json($response);
         }
 
         if ($month < 10) {
@@ -257,20 +261,26 @@ class DashboardController extends Controller
             $endDate = new DateTime($date . ' ' . $value['endTime'], $timezone);
 
             $endDate = $endDate->getTimestamp();
-
+            
             $selectRaw .= ',(SELECT COUNT(*) FROM tasks WHERE created_at BETWEEN ' . $startDate . ' AND ' . $endDate . ') as "' . $value['startTime'] . '"';
         }
 
-        $data = DB::table('tasks')->select(DB::raw($selectRaw))->limit(1)->get();
-
-        if (empty($data)) {
-            return response()->json($response);
+        try {
+            $data = DB::table('tasks')->select(DB::raw($selectRaw))->first();
+        } catch (\Throwable $th) {
+            $data = null;
         }
 
-        foreach ($response as $key => $value) {
-            foreach ($data[0] as $key2 => $value2) {
-                if ($value['startTime'] === $key2) {
-                    $response[$key]['total'] = $value2;
+        if (empty($data)) {
+            foreach ($response as $key => $value) {
+                $response[$key]['total'] = 0;
+            }
+        } else {
+            foreach ($response as $key => $value) {
+                foreach ($data as $key2 => $value2) {
+                    if ($value['startTime'] === $key2) {
+                        $response[$key]['total'] = $value2;
+                    }
                 }
             }
         }
@@ -373,13 +383,13 @@ class DashboardController extends Controller
             $selectRaw .= ',(SELECT COUNT(*) FROM tasks WHERE created_at BETWEEN ' . $value['startTime'] . ' AND ' . $value['endTime'] . ') as "' . $key . '"';
         }
 
-        $data = DB::table('tasks')->select(DB::raw($selectRaw))->limit(1)->get();
+        $data = DB::table('tasks')->select(DB::raw($selectRaw))->first();
 
         if (empty($data)) {
             return response()->json($response);
         }
 
-        foreach ($data[0] as $key => $value) {
+        foreach ($data as $key => $value) {
             if ($key === 'id') {
                 continue;
             }
@@ -446,7 +456,7 @@ class DashboardController extends Controller
         }
 
         return response()->json(
-            DB::table('tasks')->select(DB::raw($selectRaw))->limit(1)->first()
+            DB::table('tasks')->select(DB::raw($selectRaw))->first()
         );
     }
 

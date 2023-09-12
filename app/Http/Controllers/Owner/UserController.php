@@ -74,6 +74,48 @@ class UserController extends Controller
             }
         }
 
+        if ($data['input']['page'] > 2) {
+            $data['firstPageURL'] = route('owner.users.index', [
+                'page' => 1,
+                'role' => $data['input']['role'],
+                'start_date_created' => $data['input']['start_date_created'],
+                'end_date_created' => $data['input']['end_date_created'],
+                'keyword' => $data['input']['keyword']
+            ]);
+
+            $data['previousPageURL'] = route('owner.users.index', [
+                'page' => $data['input']['page'] - 1,
+                'role' => $data['input']['role'],
+                'start_date_created' => $data['input']['start_date_created'],
+                'end_date_created' => $data['input']['end_date_created'],
+                'keyword' => $data['input']['keyword']
+            ]);
+        } else {
+            $data['firstPageURL'] = '';
+            $data['previousPageURL'] = '';
+        }
+
+        if ($data['input']['page'] > 499) {
+            $data['lastPageURL'] = '';
+            $data['nextPageURL'] = '';
+        } else {
+            $data['lastPageURL'] = route('owner.users.index', [
+                'page' => $data['totalPages'],
+                'role' => $data['input']['role'],
+                'start_date_created' => $data['input']['start_date_created'],
+                'end_date_created' => $data['input']['end_date_created'],
+                'keyword' => $data['input']['keyword']
+            ]);
+    
+            $data['nextPageURL'] = route('owner.users.index', [
+                'page' => $data['input']['page'] + 1,
+                'role' => $data['input']['role'],
+                'start_date_created' => $data['input']['start_date_created'],
+                'end_date_created' => $data['input']['end_date_created'],
+                'keyword' => $data['input']['keyword']
+            ]);
+        }
+
         return view('pages.owner.user.index', $data);
     }
 

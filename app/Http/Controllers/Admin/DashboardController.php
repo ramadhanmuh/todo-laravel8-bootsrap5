@@ -42,26 +42,28 @@ class DashboardController extends Controller
             return response()->json(['total' => 0]);
         }
 
-        $dateExploded = explode($date, '-');
+        $dateExploded = explode('-', $date);
 
-        if (count($dateExploded) < 3 || !checkdate(intval($dateExploded[1]), intval($dateExploded[2]), intval($dateExploded[0]))) {
+        if (count($dateExploded) !== 3 || !checkdate(intval($dateExploded[1]), intval($dateExploded[2]), intval($dateExploded[0]))) {
             return response()->json(['total' => 0]);
         }
 
-        $startUnix = new DateTime($date . ' 00:00:00');
+        try {
+            $timezone = new DateTimeZone($request->timezone);
+        } catch (\Throwable $th) {
+            $timezone = new DateTimeZone('UTC');
+        }
 
-        $startUnix->setTimezone(new DateTimeZone('UTC'));
+        $startUnix = new DateTime($date . ' 00:00:00', $timezone);
 
-        $startUnix = strtotime($startUnix->format('Y-m-d H:i:s'));
+        $startUnix = $startUnix->getTimestamp();
 
-        $endUnix = new DateTime($date . ' 23:59:59');
+        $endUnix = new DateTime($date . ' 23:59:59', $timezone);
 
-        $endUnix->setTimezone(new DateTimeZone('UTC'));
-
-        $endUnix = strtotime($endUnix->format('Y-m-d H:i:s'));
+        $endUnix = $endUnix->getTimestamp();
 
         $total = DB::table('tasks')->whereBetween('created_at', [
-            $startUnix - 1, $endUnix + 1
+            $startUnix, $endUnix
         ])->count();
         
         return response()->json(['total' => $total]);
@@ -74,44 +76,40 @@ class DashboardController extends Controller
             return response()->json(['total' => 0]);
         }
 
-        $dateExploded = explode($date, '-');
+        $dateExploded = explode('-', $date);
 
         if (count($dateExploded) < 3 || !checkdate(intval($dateExploded[1]), intval($dateExploded[2]), intval($dateExploded[0]))) {
             return response()->json(['total' => 0]);
         }
 
+        try {
+            $timezone = new DateTimeZone($request->timezone);
+        } catch (\Throwable $th) {
+            $timezone = new DateTimeZone('UTC');
+        }
+
         $startDate = $dateExploded[0] . '-' . $dateExploded[1] . '-01' . ' 00:00:00';
 
-        $startUnix = new DateTime($startDate);
+        $startUnix = new DateTime($startDate, $timezone);
 
-        $startUnix->setTimezone(new DateTimeZone('UTC'));
-
-        $startUnix = strtotime($startUnix->format('Y-m-d H:i:s'));
+        $startUnix = $startUnix->getTimestamp();
 
         if (checkdate(intval($dateExploded[1]), 31, intval($dateExploded[0]))) {
-            $endDate = $dateExploded[2] . '-' . $dateExploded[1] . '-31 23:59:59';
+            $endDate = $dateExploded[0] . '-' . $dateExploded[1] . '-31 23:59:59';
+        } else if (checkdate(intval($dateExploded[1]), 30, intval($dateExploded[0]))) {
+            $endDate = $dateExploded[0] . '-' . $dateExploded[1] . '-30 23:59:59';
+        } else if (checkdate(intval($dateExploded[1]), 29, intval($dateExploded[0]))) {
+            $endDate = $dateExploded[0] . '-' . $dateExploded[1] . '-29 23:59:59';
+        } else {
+            $endDate = $dateExploded[0] . '-' . $dateExploded[1] . '-28 23:59:59';
         }
 
-        if (checkdate(intval($dateExploded[1]), 30, intval($dateExploded[0]))) {
-            $endDate = $dateExploded[2] . '-' . $dateExploded[1] . '-30 23:59:59';
-        }
+        $endUnix = new DateTime($endDate, $timezone);
 
-        if (checkdate(intval($dateExploded[1]), 29, intval($dateExploded[0]))) {
-            $endDate = $dateExploded[2] . '-' . $dateExploded[1] . '-29 23:59:59';
-        }
-
-        if (checkdate(intval($dateExploded[1]), 28, intval($dateExploded[0]))) {
-            $endDate = $dateExploded[2] . '-' . $dateExploded[1] . '-28 23:59:59';
-        }
-
-        $endUnix = new DateTime($endDate);
-
-        $endUnix->setTimezone(new DateTimeZone('UTC'));
-
-        $endUnix = strtotime($endUnix->format('Y-m-d H:i:s'));
+        $endUnix = $endUnix->getTimestamp();
 
         $total = DB::table('tasks')->whereBetween('created_at', [
-            $startUnix - 1, $endUnix + 1
+            $startUnix, $endUnix
         ])->count();
         
         return response()->json(['total' => $total]);
